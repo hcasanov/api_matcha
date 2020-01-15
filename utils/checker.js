@@ -9,18 +9,6 @@ module.exports = {
             'passwd': Joi.string().pattern(new RegExp('^(?=.*[A-Z])')).required(), // Min 5 caracteres, min 1 alpha, min 1 num
             'repeatPasswd': Joi.ref('passwd'),
             'dateBirth': Joi.required(),
-            'gender': Joi.string().required(),
-            'description': Joi.string().required(),
-            'picturesProfilePicture': Joi.required(),
-            'picturesOtherPictures': Joi.required(),
-            'researchParametersHastags': Joi.required(),
-            'researchParametersPerimeter': Joi.required(),
-            'researchParametersMyLatitude': Joi.required(),
-            'researchParametersMyLongitude': Joi.required(),
-            'researchParametersAgeMin': Joi.number().integer().required(),
-            'researchParametersAgeMax': Joi.number().integer().required(),
-            'researchParametersGender': Joi.required(),
-            'metaOnline': Joi.required()
         })
         return Schema.validate(message);
     },
