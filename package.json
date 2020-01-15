@@ -4,7 +4,8 @@
   "description": "API for matcha project",
   "main": "server.js",
   "scripts": {
-    "test": "nodemon server.js"
+    "test": "nodemon server.js",
+    "initdb": "node config/init.js"
   },
   "repository": {
     "type": "git",
