@@ -51,7 +51,7 @@ module.exports = {
     ValidationErrorLogin: function (message) {
         const Schema = Joi.object().keys({
             'mail': Joi.string().email({ minDomainSegments: 2 }).required(),
-            'passwd': Joi.string().required(),
+            'passwd': Joi.string().required()
         })
         return Schema.validate(message);
     },

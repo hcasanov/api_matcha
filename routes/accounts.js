@@ -4,6 +4,15 @@ var jwtDecode = require('jwt-decode');
 const nodemailer = require('nodemailer');
 const Checker = require('../utils/checker');
 const database = require('../config/db');
+const pg = require('pg');
+
+const config = {
+    user: process.env.SQL_USER,
+    host: process.env.SQL_HOST,
+    database: process.env.SQL_DATABASE,
+    port: process.env.SQL_POT
+};
+const pool = new pg.Pool(config);
 
 module.exports = {
     register: async function(req, res) {
@@ -20,8 +29,10 @@ module.exports = {
         if (!Checker.checkPasswd(req.body.passwd, req.body.repeatPasswd))
             return res.status(403).send("Incorrect password");
 
+        var passwd = await bcrypt.hash(req.body.passwd, 10);
+            
         // Query to database
-        var new_account = database.query("INSERT INTO accounts (name, firstname, mail, passwd, datebirth) VALUES (\'" + req.body.name + "\', \'" + req.body.firstname + "\', \'" + req.body.mail + "\', \'" + req.body.passwd + "\', \'" + req.body.dateBirth + "\') ");
+        var new_account = database.query("INSERT INTO accounts (name, firstname, mail, passwd, datebirth) VALUES (\'" + req.body.name + "\', \'" + req.body.firstname + "\', \'" + req.body.mail + "\', \'" + passwd + "\', \'" + req.body.dateBirth + "\') ");
         if (new_account == 'error')
             return res.status(500).send('Internal Server Error');
         else
@@ -34,7 +45,35 @@ module.exports = {
         }
 
     },
-    login: function(req, res){return res.send('ok');},
+    login: function(req, res){
+        let { error } = Checker.ValidationErrorLogin(req.body)
+        if (error) {
+            return res.status(403).send(error.details[0].message);
+        }
+
+        pool.connect(function(err, client, done) {
+            client.query("SELECT id, passwd FROM accounts WHERE mail = \'" + req.body.mail + "\';", (err, result) => {
+                done();
+                found = result.rows[0];
+                if (err){
+                    console.log(err);
+                    return res.status(500).send('Internal Server Error');
+                }
+                else {
+                    bcrypt.compare(req.body.passwd, found.passwd, function (err, result) {
+                        if (result) {
+                            return res.status(202).json({
+                                '_id': found.id,
+                                'token': JWT.generateTokenLogin(found.id)
+                            });
+                        } else {
+                            return res.status(401).send("Unauthorized");
+                        }
+                    });                    
+                }
+            });
+        })
+    },
     name: function(req, res){return res.send('ok');},
     firstname: function(req, res){return res.send('ok');},
     mail: function(req, res){return res.send('ok');},

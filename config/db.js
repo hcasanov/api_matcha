@@ -14,14 +14,14 @@ const pool = new pg.Pool(config);
 module.exports = {
     query: function(req){
         pool.connect(function(err, client, done) {
-            client.query(req, (err, res) => {
+            client.query(req, (err, result) => {
                 done();
                 if (err){
                     console.log(err);
                     return('error');
                 }
                 else {
-                    return(res);
+                    return (result);
                 }
             });
         })
