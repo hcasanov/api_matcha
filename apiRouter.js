@@ -23,6 +23,6 @@ exports.router = (function() {
     myRouter.route('/accounts/research/agemin/').put(Accounts.research_ageMin);
     myRouter.route('/accounts/research/agemax/').put(Accounts.delete);
     myRouter.route('/delete/accounts/').delete(Accounts.delete);
-
+    
     return myRouter;
 })();

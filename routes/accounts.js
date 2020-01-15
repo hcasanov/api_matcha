@@ -7,7 +7,32 @@ const database = require('../config/db');
 
 module.exports = {
     register: async function(req, res) {
-        return res.send('ok');
+
+        // Parsing
+        let { error } = Checker.ValidationError(req.body);
+        if (error) {
+            return res.status(403).send(error.details[0].message)
+        }
+
+        if (!Checker.isAdult(req.body.dateBirth))
+            return res.status(403).send("Too young to subscribe");
+
+        if (!Checker.checkPasswd(req.body.passwd, req.body.repeatPasswd))
+            return res.status(403).send("Incorrect password");
+
+        // Query to database
+        var new_account = database.query("INSERT INTO accounts (name, firstname, mail, passwd, datebirth) VALUES (\'" + req.body.name + "\', \'" + req.body.firstname + "\', \'" + req.body.mail + "\', \'" + req.body.passwd + "\', \'" + req.body.dateBirth + "\') ");
+        if (new_account == 'error')
+            return res.status(500).send('Internal Server Error');
+        else
+        {
+            new_id = database.query("SELECT id FROM accounts WHERE mail = \'" + req.body.mail + "\';");
+            token = {
+                'token': JWT.generateTokenLogin(new_id)
+            }
+            return res.status(201).json(token);
+        }
+
     },
     login: function(req, res){return res.send('ok');},
     name: function(req, res){return res.send('ok');},
