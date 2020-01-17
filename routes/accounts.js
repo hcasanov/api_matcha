@@ -1,6 +1,6 @@
 const bcrypt = require('bcrypt');
 const JWT = require('../utils/jwt');
-var jwtDecode = require('jwt-decode');
+var jwt_decode = require('jwt-decode');
 const nodemailer = require('nodemailer');
 const Checker = require('../utils/checker');
 const database = require('../config/db');
@@ -53,12 +53,14 @@ module.exports = {
 
         pool.connect(function(err, client, done) {
             client.query("SELECT id, passwd FROM accounts WHERE mail = \'" + req.body.mail + "\';", (err, result) => {
-                done();
+                
                 found = result.rows[0];
                 if (err){
                     console.log(err);
                     return res.status(500).send('Internal Server Error');
                 }
+                else if (result.rows[0] == undefined)
+                    return res.status(404).send('Not Found');
                 else {
                     bcrypt.compare(req.body.passwd, found.passwd, function (err, result) {
                         if (result) {
@@ -67,6 +69,7 @@ module.exports = {
                                 'token': JWT.generateTokenLogin(found.id)
                             });
                         } else {
+                            done();
                             return res.status(401).send("Unauthorized");
                         }
                     });                    
@@ -74,22 +77,349 @@ module.exports = {
             });
         })
     },
-    name: function(req, res){return res.send('ok');},
-    firstname: function(req, res){return res.send('ok');},
-    mail: function(req, res){return res.send('ok');},
-    passwd: function(req, res){return res.send('ok');},
-    dateBirth: function(req, res){return res.send('ok');},
-    gender: function(req, res){return res.send('ok');},
-    description: function(req, res){return res.send('ok');},
-    pictures: function(req, res){return res.send('ok');},
-    hashtags: function(req, res){return res.send('ok');},
-    research_hashtags: function(req, res){return res.send('ok');},
-    research_myLatitude: function(req, res){return res.send('ok');},
-    research_myLongitude: function(req, res){return res.send('ok');},
-    research_perimeter: function(req, res){return res.send('ok');},
-    research_gender: function(req, res){return res.send('ok');},
-    research_ageMin: function(req, res){return res.send('ok');},
-    research_ageMax: function(req, res){return res.send('ok');},
-    delete: function(req, res){}
-
+    name: async function(req, res){
+        if (req.body.token == undefined || req.body.name == undefined)
+            return res.status(400).send('Bad Request');
+        pool.connect(function(err, client, done) {
+            var id = jwt_decode(req.body.token).id;
+            var query = "SELECT token FROM accounts WHERE id = \'" + id + "\';";
+            client.query(query, (err, result) => {
+                if (err)
+                    return res.status(500).send('Internal Server Error');
+                else if (result == undefined)
+                    return res.status(401).send('Unauthorized');
+                else if (result.rows[0].token === req.body.token){
+                    var update_query = "UPDATE accounts SET name = \'" + req.body.name + "\' WHERE id = \'" + id + "\';";
+                    client.query(update_query, (err, result) => {
+                        if (err)
+                            return res.status(500).send('Internal Server Error');
+                        done();
+                        return res.status(200).send('OK');
+                    })
+                }
+                else
+                    return res.status(401).send('Unauthorized');
+            })
+        })
+    },
+    firstname: function(req, res){
+        if (req.body.token == undefined || req.body.firstname == undefined)
+            return res.status(400).send('Bad Request');
+        pool.connect(function(err, client, done) {
+            var id = jwt_decode(req.body.token).id;
+            var query = "SELECT token FROM accounts WHERE id = \'" + id + "\';";
+            client.query(query, (err, result) => {
+                if (err)
+                    return res.status(500).send('Internal Server Error');
+                else if (result == undefined)
+                    return res.status(401).send('Unauthorized');
+                else if (result.rows[0].token === req.body.token){
+                    var update_query = "UPDATE accounts SET firstname = \'" + req.body.firstname + "\' WHERE id = \'" + id + "\';";
+                    client.query(update_query, (err, result) => {
+                        if (err)
+                            return res.status(500).send('Internal Server Error');
+                        done();
+                        return res.status(200).send('OK');
+                    })
+                }
+                else
+                    return res.status(401).send('Unauthorized');
+            })
+        })
+    },
+    mail: function(req, res){
+        if (req.body.token == undefined || req.body.mail == undefined)
+            return res.status(400).send('Bad Request');
+        pool.connect(function(err, client, done) {
+            var id = jwt_decode(req.body.token).id;
+            var query = "SELECT token FROM accounts WHERE id = \'" + id + "\';";
+            client.query(query, (err, result) => {
+                if (err)
+                    return res.status(500).send('Internal Server Error');
+                else if (result == undefined)
+                    return res.status(401).send('Unauthorized');
+                else if (result.rows[0].token === req.body.token){
+                    var update_query = "UPDATE accounts SET mail = \'" + req.body.mail + "\' WHERE id = \'" + id + "\';";
+                    client.query(update_query, (err, result) => {
+                        if (err)
+                            return res.status(500).send('Internal Server Error');
+                        done();
+                        return res.status(200).send('OK');
+                    })
+                }
+                else
+                    return res.status(401).send('Unauthorized');
+            })
+        })
+    },
+    passwd: function(req, res){
+        if (req.body.token == undefined || req.body.passwd == undefined)
+            return res.status(400).send('Bad Request');
+        pool.connect( async function(err, client, done) {
+            var id = await jwt_decode(req.body.token).id;
+            var query = "SELECT token FROM accounts WHERE id = \'" + id + "\';";
+            client.query(query, async (err, result) => {
+                if (err)
+                    return res.status(500).send('Internal Server Error');
+                else if (result == undefined)
+                    return res.status(401).send('Unauthorized');
+                else if (result.rows[0].token === req.body.token){
+                    var passwd = await bcrypt.hash(req.body.passwd, 10);
+                    var update_query = "UPDATE accounts SET passwd = \'" + passwd + "\' WHERE id = \'" + id + "\';";
+                    client.query(update_query, (err, result) => {
+                        if (err)
+                            return res.status(500).send('Internal Server Error');
+                        done();
+                        return res.status(200).send('OK');
+                    })
+                }
+                else
+                    return res.status(401).send('Unauthorized');
+            })
+        })
+    },
+    dateBirth: function(req, res){
+        if (req.body.token == undefined || req.body.dateBirth == undefined)
+            return res.status(400).send('Bad Request');
+        pool.connect(function(err, client, done) {
+            var id = jwt_decode(req.body.token).id;
+            var query = "SELECT token FROM accounts WHERE id = \'" + id + "\';";
+            client.query(query, (err, result) => {
+                if (err)
+                    return res.status(500).send('Internal Server Error');
+                else if (result == undefined)
+                    return res.status(401).send('Unauthorized');
+                else if (result.rows[0].token === req.body.token){
+                    var update_query = "UPDATE accounts SET datebirth = \'" + req.body.dateBirth + "\' WHERE id = \'" + id + "\';";
+                    client.query(update_query, (err, result) => {
+                        if (err)
+                            return res.status(500).send('Internal Server Error');
+                        done();
+                        return res.status(200).send('OK');
+                    })
+                }
+                else
+                    return res.status(401).send('Unauthorized');
+            })
+        })
+    },
+    gender: function(req, res){
+        if (req.body.token == undefined || req.body.gender == undefined)
+            return res.status(400).send('Bad Request');
+        pool.connect(function(err, client, done) {
+            var id = jwt_decode(req.body.token).id;
+            var query = "SELECT token FROM accounts WHERE id = \'" + id + "\';";
+            client.query(query, (err, result) => {
+                if (err)
+                    return res.status(500).send('Internal Server Error');
+                else if (result == undefined)
+                    return res.status(401).send('Unauthorized');
+                else if (result.rows[0].token === req.body.token){
+                    var update_query = "UPDATE accounts SET gender = \'" + req.body.gender + "\' WHERE id = \'" + id + "\';";
+                    client.query(update_query, (err, result) => {
+                        if (err)
+                            return res.status(500).send('Internal Server Error');
+                        done();
+                        return res.status(200).send('OK');
+                    })
+                }
+                else
+                    return res.status(401).send('Unauthorized');
+            })
+        })
+    },
+    description: function(req, res){
+        if (req.body.token == undefined || req.body.description == undefined)
+            return res.status(400).send('Bad Request');
+        pool.connect(function(err, client, done) {
+            var id = jwt_decode(req.body.token).id;
+            var query = "SELECT token FROM accounts WHERE id = \'" + id + "\';";
+            client.query(query, (err, result) => {
+                if (err)
+                    return res.status(500).send('Internal Server Error');
+                else if (result == undefined)
+                    return res.status(401).send('Unauthorized');
+                else if (result.rows[0].token === req.body.token){
+                    var update_query = "UPDATE accounts SET description = \'" + req.body.description + "\' WHERE id = \'" + id + "\';";
+                    client.query(update_query, (err, result) => {
+                        if (err)
+                            return res.status(500).send('Internal Server Error');
+                        done();
+                        return res.status(200).send('OK');
+                    })
+                }
+                else
+                    return res.status(401).send('Unauthorized');
+            })
+        })
+    },
+    hashtags: function(req, res){
+        if (req.body.token == undefined || req.body.hashtags == undefined)
+            return res.status(400).send('Bad Request');
+        pool.connect(function(err, client, done) {
+            var id = jwt_decode(req.body.token).id;
+            var query = "SELECT token FROM accounts WHERE id = \'" + id + "\';";
+            client.query(query, (err, result) => {
+                if (err)
+                    return res.status(500).send('Internal Server Error');
+                else if (result == undefined)
+                    return res.status(401).send('Unauthorized');
+                else if (result.rows[0].token === req.body.token){
+                    var update_query = "UPDATE accounts SET hashtags = \'" + req.body.hashtags + "\' WHERE id = \'" + id + "\';";
+                    client.query(update_query, (err, result) => {
+                        if (err)
+                            return res.status(500).send('Internal Server Error');
+                        done();
+                        return res.status(200).send('OK');
+                    })
+                }
+                else
+                    return res.status(401).send('Unauthorized');
+            })
+        })
+    },
+    research_hashtags: function(req, res){
+        if (req.body.token == undefined || req.body.research_hashtags == undefined)
+            return res.status(400).send('Bad Request');
+        pool.connect(function(err, client, done) {
+            var id = jwt_decode(req.body.token).id;
+            var query = "SELECT token FROM accounts WHERE id = \'" + id + "\';";
+            client.query(query, (err, result) => {
+                if (err)
+                    return res.status(500).send('Internal Server Error');
+                else if (result == undefined)
+                    return res.status(401).send('Unauthorized');
+                else if (result.rows[0].token === req.body.token){
+                    var update_query = "UPDATE accounts SET research_hashtags = \'" + req.body.research_hashtags + "\' WHERE id = \'" + id + "\';";
+                    client.query(update_query, (err, result) => {
+                        if (err)
+                            return res.status(500).send('Internal Server Error');
+                        done();
+                        return res.status(200).send('OK');
+                    })
+                }
+                else
+                    return res.status(401).send('Unauthorized');
+            })
+        })
+    },
+    research_perimeter: function(req, res){
+        if (req.body.token == undefined || req.body.research_perimeter == undefined)
+            return res.status(400).send('Bad Request');
+        pool.connect(function(err, client, done) {
+            var id = jwt_decode(req.body.token).id;
+            var query = "SELECT token FROM accounts WHERE id = \'" + id + "\';";
+            client.query(query, (err, result) => {
+                if (err)
+                    return res.status(500).send('Internal Server Error');
+                else if (result == undefined)
+                    return res.status(401).send('Unauthorized');
+                else if (result.rows[0].token === req.body.token){
+                    var update_query = "UPDATE accounts SET research_perimeter = \'" + req.body.research_perimeter + "\' WHERE id = \'" + id + "\';";
+                    client.query(update_query, (err, result) => {
+                        if (err)
+                            return res.status(500).send('Internal Server Error');
+                        done();
+                        return res.status(200).send('OK');
+                    })
+                }
+                else
+                    return res.status(401).send('Unauthorized');
+            })
+        })
+    },
+    research_gender: function(req, res){
+        if (req.body.token == undefined || req.body.research_gender == undefined)
+            return res.status(400).send('Bad Request');
+        pool.connect(function(err, client, done) {
+            var id = jwt_decode(req.body.token).id;
+            var query = "SELECT token FROM accounts WHERE id = \'" + id + "\';";
+            client.query(query, (err, result) => {
+                if (err)
+                    return res.status(500).send('Internal Server Error');
+                else if (result == undefined)
+                    return res.status(401).send('Unauthorized');
+                else if (result.rows[0].token === req.body.token){
+                    var update_query = "UPDATE accounts SET research_gender = \'" + req.body.research_gender + "\' WHERE id = \'" + id + "\';";
+                    client.query(update_query, (err, result) => {
+                        if (err)
+                            return res.status(500).send('Internal Server Error');
+                        done();
+                        return res.status(200).send('OK');
+                    })
+                }
+                else
+                    return res.status(401).send('Unauthorized');
+            })
+        })
+    },
+    research_ageMin: function(req, res){
+        if (req.body.token == undefined || req.body.research_ageMin == undefined)
+            return res.status(400).send('Bad Request');
+        pool.connect(function(err, client, done) {
+            var id = jwt_decode(req.body.token).id;
+            var query = "SELECT token FROM accounts WHERE id = \'" + id + "\';";
+            client.query(query, (err, result) => {
+                if (err)
+                    return res.status(500).send('Internal Server Error');
+                else if (result.rows[0] == undefined)
+                    return res.status(401).send('Unauthorized');
+                else if (result.rows[0].token === req.body.token){
+                    var update_query = "UPDATE accounts SET research_age_min = \'" + req.body.research_ageMin + "\' WHERE id = \'" + id + "\';";
+                    client.query(update_query, (err, result) => {
+                        if (err)
+                            return res.status(500).send('Internal Server Error');
+                        done();
+                        return res.status(200).send('OK');
+                    })
+                }
+                else
+                    return res.status(401).send('Unauthorized');
+            })
+        })
+    },
+    research_ageMax: function(req, res){
+        if (req.body.token == undefined || req.body.research_ageMax == undefined)
+            return res.status(400).send('Bad Request');
+        pool.connect(function(err, client, done) {
+            var id = jwt_decode(req.body.token).id;
+            var query = "SELECT token FROM accounts WHERE id = \'" + id + "\';";
+            client.query(query, (err, result) => {
+                console.log(id)
+                if (err)
+                    return res.status(500).send('Internal Server Error');
+                else if (result.rows[0] == undefined)
+                    return res.status(401).send('Unauthorized');
+                else if (result.rows[0].token === req.body.token){
+                    var update_query = "UPDATE accounts SET research_age_max = \'" + req.body.research_ageMax + "\' WHERE id = \'" + id + "\';";
+                    client.query(update_query, (err, result) => {
+                        if (err)
+                            return res.status(500).send('Internal Server Error');
+                        if (result == undefined)
+                            return res.status(500).send('Internal Server Error');
+                        done();
+                        return res.status(200).send('OK');
+                    })
+                }
+                else
+                    return res.status(401).send('Unauthorized');
+            })
+        })
+    },
+    delete: function(req, res){
+        if (req.body.token == undefined)
+            return res.status(400).send('Bad Request');
+        pool.connect(function(err, client, done) {
+            var id = jwt_decode(req.body.token).id;
+            var query = "DELETE FROM accounts WHERE id = \'" + id + "\';";
+            client.query(query, (err, result) => {
+                if (err)
+                    return res.status(500).send('Internal Server Error');
+                else if (result == undefined)
+                    return res.status(401).send('Unauthorized');
+                else
+                    return res.status(200).send('OK');
+            })
+        })
+    }
 }
