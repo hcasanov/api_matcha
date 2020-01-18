@@ -1,5 +1,6 @@
 var express = require('express');
 var Accounts = require('./routes/accounts');
+var Location = require('./routes/location');
 
 exports.router = (function() {
     var myRouter = express.Router();
@@ -15,13 +16,15 @@ exports.router = (function() {
     myRouter.route('/accounts/description/').put(Accounts.description);
     myRouter.route('/accounts/hashtags/').put(Accounts.hashtags);
     myRouter.route('/accounts/research/hashtags/').put(Accounts.research_hashtags);
-    // myRouter.route('/accounts/research/mylatitude/').put(Accounts.research_myLatitude);
-    // myRouter.route('/accounts/research/mylongitude/').put(Accounts.research_myLongitude);
     myRouter.route('/accounts/research/perimeter/').put(Accounts.research_perimeter);
     myRouter.route('/accounts/research/gender/').put(Accounts.research_gender);
     myRouter.route('/accounts/research/agemin/').put(Accounts.research_ageMin);
     myRouter.route('/accounts/research/agemax/').put(Accounts.research_ageMax);
     myRouter.route('/accounts/delete/').delete(Accounts.delete);
     
+    myRouter.route('/accounts/location').post(Location.post);
+    myRouter.route('/accounts/location').put(Location.put);
+    // myRouter.route('/accounts/location/:idAccount').get(Accounts.get);
+
     return myRouter;
 })();
