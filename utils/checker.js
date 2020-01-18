@@ -1,4 +1,13 @@
 const Joi = require('@hapi/joi');
+const pg = require('pg');
+
+const config = {
+    user: process.env.SQL_USER,
+    host: process.env.SQL_HOST,
+    database: process.env.SQL_DATABASE,
+    port: process.env.SQL_POT
+};
+const pool = new pg.Pool(config);
 
 module.exports = {
     ValidationError: function (message) {
@@ -76,5 +85,19 @@ module.exports = {
     },
     arrayHashtags: function (req) {
         return (req.split(','));
+    },
+    accountExist: function(mail, callback){
+        pool.connect(function(err, client, done){
+            client.query("SELECT id FROM accounts WHERE mail = \'" + mail + "\';", (err, result) => {
+                done();
+                if (err){
+                    console.log(err);
+                }
+                else if (result.rows[0] == undefined)
+                    callback(false);
+                else
+                    callback(true);
+            })
+        })
     }
-}
+}   
