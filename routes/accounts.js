@@ -36,7 +36,9 @@ module.exports = {
 
             // Query to database
             pool.connect(async function (err, client, done) {
-                var new_account = await client.query("INSERT INTO accounts (name, firstname, mail, passwd, datebirth) VALUES (\'" + req.body.name + "\', \'" + req.body.firstname + "\', \'" + req.body.mail + "\', \'" + passwd + "\', \'" + req.body.dateBirth + "\') ");
+                var date_created = Date();
+                var date_update = Date();
+                var new_account = await client.query("INSERT INTO accounts (name, firstname, mail, passwd, datebirth, date_created, date_update) VALUES (\'" + req.body.name + "\', \'" + req.body.firstname + "\', \'" + req.body.mail + "\', \'" + passwd + "\', \'" + req.body.dateBirth + "\', \'" + date_created + "\', \'" + date_update + "\') ");
                 if (new_account == 'error')
                     return res.status(500).send('Internal Server Error');
                 else {
@@ -75,10 +77,14 @@ module.exports = {
                 else {
                     bcrypt.compare(req.body.passwd, found.passwd, function (err, result) {
                         if (result) {
-                            return res.status(202).json({
-                                '_id': found.id,
-                                'token': JWT.generateTokenLogin(found.id)
-                            });
+                            var token = JWT.generateTokenLogin(found.id);
+                            client.query("UPDATE accounts SET token = \'" + token + "\';", function(err){
+                                done();
+                                return res.status(202).json({
+                                    '_id': found.id,
+                                    'token': token
+                                });
+                            })
                         } else {
                             done();
                             return res.status(401).send("Unauthorized");
@@ -100,7 +106,8 @@ module.exports = {
                 else if (result == undefined)
                     return res.status(401).send('Unauthorized');
                 else if (result.rows[0].token === req.body.token) {
-                    var update_query = "UPDATE accounts SET name = \'" + req.body.name + "\' WHERE id = \'" + id + "\';";
+                    var date_update = Date();
+                    var update_query = "UPDATE accounts SET name = \'" + req.body.name + "\', date_update = \'" + date_update + "\' WHERE id = \'" + id + "\';";
                     client.query(update_query, (err, result) => {
                         if (err)
                             return res.status(500).send('Internal Server Error');
@@ -125,7 +132,8 @@ module.exports = {
                 else if (result == undefined)
                     return res.status(401).send('Unauthorized');
                 else if (result.rows[0].token === req.body.token) {
-                    var update_query = "UPDATE accounts SET firstname = \'" + req.body.firstname + "\' WHERE id = \'" + id + "\';";
+                    var date_update = Date();
+                    var update_query = "UPDATE accounts SET firstname = \'" + req.body.firstname + "\', date_update = \'" + date_update + "\' WHERE id = \'" + id + "\';";
                     client.query(update_query, (err, result) => {
                         if (err)
                             return res.status(500).send('Internal Server Error');
@@ -150,7 +158,8 @@ module.exports = {
                 else if (result == undefined)
                     return res.status(401).send('Unauthorized');
                 else if (result.rows[0].token === req.body.token) {
-                    var update_query = "UPDATE accounts SET mail = \'" + req.body.mail + "\' WHERE id = \'" + id + "\';";
+                    var date_update = Date();
+                    var update_query = "UPDATE accounts SET mail = \'" + req.body.mail + "\', date_update = \'" + date_update + "\' WHERE id = \'" + id + "\';";
                     client.query(update_query, (err, result) => {
                         if (err)
                             return res.status(500).send('Internal Server Error');
@@ -175,8 +184,9 @@ module.exports = {
                 else if (result == undefined)
                     return res.status(401).send('Unauthorized');
                 else if (result.rows[0].token === req.body.token) {
+                    var date_update = Date();
                     var passwd = await bcrypt.hash(req.body.passwd, 10);
-                    var update_query = "UPDATE accounts SET passwd = \'" + passwd + "\' WHERE id = \'" + id + "\';";
+                    var update_query = "UPDATE accounts SET passwd = \'" + passwd + "\', date_update = \'" + date_update + "\' WHERE id = \'" + id + "\';";
                     client.query(update_query, (err, result) => {
                         if (err)
                             return res.status(500).send('Internal Server Error');
@@ -201,7 +211,8 @@ module.exports = {
                 else if (result == undefined)
                     return res.status(401).send('Unauthorized');
                 else if (result.rows[0].token === req.body.token) {
-                    var update_query = "UPDATE accounts SET datebirth = \'" + req.body.dateBirth + "\' WHERE id = \'" + id + "\';";
+                    var date_update = Date();
+                    var update_query = "UPDATE accounts SET datebirth = \'" + req.body.dateBirth + "\', \'" + date_update + "\' WHERE id = \'" + id + "\';";
                     client.query(update_query, (err, result) => {
                         if (err)
                             return res.status(500).send('Internal Server Error');
@@ -226,7 +237,8 @@ module.exports = {
                 else if (result == undefined)
                     return res.status(401).send('Unauthorized');
                 else if (result.rows[0].token === req.body.token) {
-                    var update_query = "UPDATE accounts SET gender = \'" + req.body.gender + "\' WHERE id = \'" + id + "\';";
+                    var date_update = Date();
+                    var update_query = "UPDATE accounts SET gender = \'" + req.body.gender + "\', date_update = \'" + date_update + "\' WHERE id = \'" + id + "\';";
                     client.query(update_query, (err, result) => {
                         if (err)
                             return res.status(500).send('Internal Server Error');
@@ -251,7 +263,8 @@ module.exports = {
                 else if (result == undefined)
                     return res.status(401).send('Unauthorized');
                 else if (result.rows[0].token === req.body.token) {
-                    var update_query = "UPDATE accounts SET description = \'" + req.body.description + "\' WHERE id = \'" + id + "\';";
+                    var date_update = Date();
+                    var update_query = "UPDATE accounts SET description = \'" + req.body.description + "\', date_update = \'" + date_update + "\' WHERE id = \'" + id + "\';";
                     client.query(update_query, (err, result) => {
                         if (err)
                             return res.status(500).send('Internal Server Error');
@@ -276,7 +289,8 @@ module.exports = {
                 else if (result == undefined)
                     return res.status(401).send('Unauthorized');
                 else if (result.rows[0].token === req.body.token) {
-                    var update_query = "UPDATE accounts SET hashtags = \'" + req.body.hashtags + "\' WHERE id = \'" + id + "\';";
+                    var date_update = Date();
+                    var update_query = "UPDATE accounts SET hashtags = \'" + req.body.hashtags + "\', date_update = \'" + date_update + "\' WHERE id = \'" + id + "\';";
                     client.query(update_query, (err, result) => {
                         if (err)
                             return res.status(500).send('Internal Server Error');
@@ -301,7 +315,8 @@ module.exports = {
                 else if (result == undefined)
                     return res.status(401).send('Unauthorized');
                 else if (result.rows[0].token === req.body.token) {
-                    var update_query = "UPDATE accounts SET research_hashtags = \'" + req.body.research_hashtags + "\' WHERE id = \'" + id + "\';";
+                    var date_update = Date();
+                    var update_query = "UPDATE accounts SET research_hashtags = \'" + req.body.research_hashtags + "\', date_update = \'" + date_update + "\' WHERE id = \'" + id + "\';";
                     client.query(update_query, (err, result) => {
                         if (err)
                             return res.status(500).send('Internal Server Error');
@@ -326,7 +341,8 @@ module.exports = {
                 else if (result == undefined)
                     return res.status(401).send('Unauthorized');
                 else if (result.rows[0].token === req.body.token) {
-                    var update_query = "UPDATE accounts SET research_perimeter = \'" + req.body.research_perimeter + "\' WHERE id = \'" + id + "\';";
+                    var date_update = Date();
+                    var update_query = "UPDATE accounts SET research_perimeter = \'" + req.body.research_perimeter + "\', date_update = \'" + date_update + "\' WHERE id = \'" + id + "\';";
                     client.query(update_query, (err, result) => {
                         if (err)
                             return res.status(500).send('Internal Server Error');
@@ -351,7 +367,8 @@ module.exports = {
                 else if (result == undefined)
                     return res.status(401).send('Unauthorized');
                 else if (result.rows[0].token === req.body.token) {
-                    var update_query = "UPDATE accounts SET research_gender = \'" + req.body.research_gender + "\' WHERE id = \'" + id + "\';";
+                    var date_update = Date();
+                    var update_query = "UPDATE accounts SET research_gender = \'" + req.body.research_gender + "\', date_update = \'" + date_update + "\' WHERE id = \'" + id + "\';";
                     client.query(update_query, (err, result) => {
                         if (err)
                             return res.status(500).send('Internal Server Error');
@@ -376,7 +393,8 @@ module.exports = {
                 else if (result.rows[0] == undefined)
                     return res.status(401).send('Unauthorized');
                 else if (result.rows[0].token === req.body.token) {
-                    var update_query = "UPDATE accounts SET research_age_min = \'" + req.body.research_ageMin + "\' WHERE id = \'" + id + "\';";
+                    var date_update = Date();
+                    var update_query = "UPDATE accounts SET research_age_min = \'" + req.body.research_ageMin + "\', date_update = \'" + date_update + "\' WHERE id = \'" + id + "\';";
                     client.query(update_query, (err, result) => {
                         if (err)
                             return res.status(500).send('Internal Server Error');
@@ -402,7 +420,8 @@ module.exports = {
                 else if (result.rows[0] == undefined)
                     return res.status(401).send('Unauthorized');
                 else if (result.rows[0].token === req.body.token) {
-                    var update_query = "UPDATE accounts SET research_age_max = \'" + req.body.research_ageMax + "\' WHERE id = \'" + id + "\';";
+                    var date_update = Date();
+                    var update_query = "UPDATE accounts SET research_age_max = \'" + req.body.research_ageMax + "\', date_update = \'" + date_update + "\' WHERE id = \'" + id + "\';";
                     client.query(update_query, (err, result) => {
                         if (err)
                             return res.status(500).send('Internal Server Error');
