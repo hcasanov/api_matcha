@@ -40,11 +40,12 @@ module.exports = {
                 return res.status(500).send('Internal Server Error');
             else {
                 var new_id = database.query("SELECT id FROM accounts WHERE mail = \'" + req.body.mail + "\';");
+                return console.log(new_id)
                 var new_token = JWT.generateTokenLogin(new_id)
                 token = {
                     'token': new_token
                 }
-                database.query("UPDATE accounts SET token = \'" + new_token + "\' WHERE id = \'" + new_id + "\';");
+                database.query("UPDATE accounts SET token = \'" + new_token + "\' WHERE id = \'" + new_id + "\';")
                 return res.status(201).json(token);
             }
         });

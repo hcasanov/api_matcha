@@ -12,11 +12,12 @@ const config = {
 const pool = new pg.Pool(config);
 
 module.exports = {
-    post: function(req,res){
+    post: function(req, res){
         if (req.body.token == undefined || req.body.latitude == undefined || req.body.longitude == undefined)
             return res.status(400).send('Bad Request');
         pool.connect(function(err, client, done) {
-            var id = jwt_decode(req.body.token).id;
+            var id = jwt_decode(req.body.token);
+            return console.log(id);
             var query = "SELECT token FROM accounts WHERE id = \'" + id + "\';";
             client.query(query, (err, result) => {
                 if (err)

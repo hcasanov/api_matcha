@@ -21,9 +21,6 @@ module.exports = {
         }, JWT_SIGN_SECRET, {
             expiresIn: '1h'
         });
-        database.query("UPDATE accounts SET token = \'" + tokenGen + "\' WHERE id = \'" + id + "\';", () => {
-            done();
-        });
         return tokenGen;
     }
 }

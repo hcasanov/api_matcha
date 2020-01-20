@@ -21,7 +21,7 @@ module.exports = {
                     return('error');
                 }
                 else {
-                    return (result);
+                    return(result.rows[0]);
                 }
             });
         })
