@@ -12,16 +12,16 @@ const config = {
 const pool = new pg.Pool(config);
 
 module.exports = {
-    query: function(req){
-        pool.connect(function(err, client, done) {
+    query: function (req) {
+        pool.connect(function (err, client, done) {
             client.query(req, (err, result) => {
                 done();
-                if (err){
+                if (err) {
                     console.log(err);
-                    return('error');
+                    return ('error');
                 }
                 else {
-                    return(result.rows[0]);
+                    return (result.rows[0]);
                 }
             });
         })

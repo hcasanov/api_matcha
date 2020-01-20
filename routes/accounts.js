@@ -35,19 +35,25 @@ module.exports = {
             var passwd = await bcrypt.hash(req.body.passwd, 10);
 
             // Query to database
-            var new_account = database.query("INSERT INTO accounts (name, firstname, mail, passwd, datebirth) VALUES (\'" + req.body.name + "\', \'" + req.body.firstname + "\', \'" + req.body.mail + "\', \'" + passwd + "\', \'" + req.body.dateBirth + "\') ");
-            if (new_account == 'error')
-                return res.status(500).send('Internal Server Error');
-            else {
-                var new_id = database.query("SELECT id FROM accounts WHERE mail = \'" + req.body.mail + "\';");
-                return console.log(new_id)
-                var new_token = JWT.generateTokenLogin(new_id)
-                token = {
-                    'token': new_token
+            pool.connect(async function (err, client, done) {
+                var new_account = await client.query("INSERT INTO accounts (name, firstname, mail, passwd, datebirth) VALUES (\'" + req.body.name + "\', \'" + req.body.firstname + "\', \'" + req.body.mail + "\', \'" + passwd + "\', \'" + req.body.dateBirth + "\') ");
+                if (new_account == 'error')
+                    return res.status(500).send('Internal Server Error');
+                else {
+                    await client.query("SELECT id FROM accounts WHERE mail = \'" + req.body.mail + "\';", async function (err, result) {
+                        if (err)
+                            return res.status(500).send('Internal Server Error')
+                        var new_id = result.rows[0].id;
+                        var new_token = JWT.generateTokenLogin(new_id)
+                        token = {
+                            'token': new_token
+                        }
+                        await client.query("UPDATE accounts SET token = \'" + new_token + "\' WHERE id = \'" + new_id + "\';");
+                        done();
+                        res.status(201).json(token)
+                    })
                 }
-                database.query("UPDATE accounts SET token = \'" + new_token + "\' WHERE id = \'" + new_id + "\';")
-                return res.status(201).json(token);
-            }
+            })
         });
     },
     login: function (req, res) {
