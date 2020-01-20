@@ -1,6 +1,6 @@
 var express = require('express');
 var Accounts = require('./routes/accounts');
-var Location = require('./routes/location');
+var Locations = require('./routes/location');
 
 exports.router = (function() {
     var myRouter = express.Router();
@@ -22,9 +22,9 @@ exports.router = (function() {
     myRouter.route('/accounts/research/agemax/').put(Accounts.research_ageMax);
     myRouter.route('/accounts/delete/').delete(Accounts.delete);
     
-    myRouter.route('/accounts/location').post(Location.post);
-    myRouter.route('/accounts/location').put(Location.put);
-    // myRouter.route('/accounts/location/:idAccount').get(Accounts.get);
+    myRouter.route('/accounts/locations').post(Locations.post);
+    myRouter.route('/accounts/locations').put(Locations.put);
+    myRouter.route('/accounts/locations').get(Locations.get);
 
     return myRouter;
 })();
