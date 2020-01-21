@@ -19,7 +19,6 @@ module.exports = {
             var id = jwt_decode(req.body.token).id;
             var query = "SELECT token FROM accounts WHERE id = \'" + id + "\';";
             client.query(query, (err, result) => {
-                // return console.log(result)
                 if (err != null)
                     return res.status(500).send('Internal Server Error');
                 else if (result.rows[0] === undefined)
@@ -30,7 +29,6 @@ module.exports = {
                     var update_query = "INSERT INTO locations (id, longitude, latitude, date_created, date_update) VALUES (\'" + id + "\', \'" + req.body.longitude + "\', \'" + req.body.latitude + "\', \'" + date_created + "\', \'" + date_update + "\');";
                     client.query(update_query, (err, result) => {
                         done();
-                        return console.log(err)
                         if (err)
                             return res.status(500).send('Internal Server Error');
                         return res.status(200).send('OK');
