@@ -1,6 +1,7 @@
-var express = require('express');
-var Accounts = require('./routes/accounts');
-var Locations = require('./routes/location');
+const express = require('express');
+const Accounts = require('./routes/accounts');
+const Locations = require('./routes/location');
+const Pictures = require('./routes/pictures');
 
 exports.router = (function() {
     var myRouter = express.Router();
@@ -25,6 +26,10 @@ exports.router = (function() {
     myRouter.route('/accounts/locations').post(Locations.post);
     myRouter.route('/accounts/locations').put(Locations.put);
     myRouter.route('/accounts/locations').get(Locations.get);
+
+    myRouter.route('/accounts/pictures').post(Pictures.post);
+    myRouter.route('/accounts/pictures').get(Pictures.get);
+    myRouter.route('/accounts/pictures').delete(Pictures.delete);
 
     return myRouter;
 })();
