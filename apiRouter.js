@@ -2,6 +2,7 @@ const express = require('express');
 const Accounts = require('./routes/accounts');
 const Locations = require('./routes/location');
 const Pictures = require('./routes/pictures');
+const Notifications = require('./routes/notifications');
 
 exports.router = (function() {
     var myRouter = express.Router();
@@ -30,6 +31,12 @@ exports.router = (function() {
     myRouter.route('/accounts/pictures').post(Pictures.post);
     myRouter.route('/accounts/pictures').get(Pictures.get);
     myRouter.route('/accounts/pictures').delete(Pictures.delete);
+
+    myRouter.route('/notifications/like').post(Notifications.new_like);
+    myRouter.route('/notifications/chat').post(Notifications.new_chat);
+    myRouter.route('/notifications/match').post(Notifications.new_match);
+    myRouter.route('/notifications/read').put(Notifications.read);
+    myRouter.route('/notifications/:token').get(Notifications.get);
 
     return myRouter;
 })();

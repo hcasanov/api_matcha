@@ -1,6 +1,4 @@
 const jwt_decode = require('jwt-decode');
-const Checker = require('../utils/checker');
-const database = require('../config/db');
 const pg = require('pg');
 
 const config = {
