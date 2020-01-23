@@ -4,6 +4,7 @@ database.query("DROP TABLE IF EXISTS accounts;");
 database.query("DROP TABLE IF EXISTS pictures;");
 database.query("DROP TABLE IF EXISTS locations;");
 database.query("DROP TABLE IF EXISTS notifications;");
+database.query("DROP TABLE IF EXISTS chats;");
 setTimeout(init, 2000);
 
 setTimeout(exit, 3000);
@@ -18,4 +19,5 @@ function init(){
     database.query("CREATE TABLE IF NOT EXISTS pictures (id SERIAL PRIMARY KEY NOT NULL, id_account SMALLINT, url_picture VARCHAR(255), file_name VARCHAR(100), date_created VARCHAR(100))\;");
     database.query("CREATE TABLE IF NOT EXISTS locations (id SERIAL PRIMARY KEY NOT NULL, latitude FLOAT NOT NULL, longitude FLOAT NOT NULL, date_created VARCHAR(100), date_update VARCHAR(100))\;");
     database.query("CREATE TABLE IF NOT EXISTS notifications (id SERIAL PRIMARY KEY NOT NULL, type VARCHAR(50), like_id INT, chat_id INT, match_id INT, name VARCHAR(150), message TEXT, from_id INT, to_id INT, status BOOLEAN, date_created VARCHAR(100), date_update VARCHAR(100))\;");
+    database.query("CREATE TABLE IF NOT EXISTS chats (id SERIAL PRIMARY KEY NOT NULL, from_id INT, to_id INT, message TEXT, date_created VARCHAR(100))\;");
 }

@@ -3,7 +3,7 @@ const Accounts = require('./routes/accounts');
 const Locations = require('./routes/location');
 const Pictures = require('./routes/pictures');
 const Notifications = require('./routes/notifications');
-// const Chats = require('./routes/chats');
+const Chats = require('./routes/chats');
 
 exports.router = (function() {
     var myRouter = express.Router();
@@ -40,7 +40,8 @@ exports.router = (function() {
     myRouter.route('/notifications/read').put(Notifications.read);
     myRouter.route('/notifications').get(Notifications.get);
     
-    // myRouter.route('/chats').get(Chats.get);
+    myRouter.route('/chats').post(Chats.post);
+    myRouter.route('/chats').get(Chats.get);
 
     return myRouter;
 })();
