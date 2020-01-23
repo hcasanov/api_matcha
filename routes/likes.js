@@ -30,7 +30,7 @@ module.exports = {
                             console.log(err);
                             return res.status(500).send('Internal Server Error');
                         }
-                        var update_query = "SELECT id, from_id FROM likes WHERE to_id = " + req.body.to_id + " AND from_id = " + id + ";";
+                        var update_query = "SELECT id, from_id FROM likes WHERE to_id = " + id + " AND from_id = " + req.body.to_id + ";";
                         client.query(update_query, async (err, result) => {
                             if (err){
                                 done();
