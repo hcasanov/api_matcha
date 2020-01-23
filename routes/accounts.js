@@ -109,9 +109,9 @@ module.exports = {
                     var date_update = Date();
                     var update_query = "UPDATE accounts SET name = \'" + req.body.name + "\', date_update = \'" + date_update + "\' WHERE id = \'" + id + "\';";
                     client.query(update_query, (err, result) => {
+                        done();
                         if (err)
                             return res.status(500).send('Internal Server Error');
-                        done();
                         return res.status(200).send('OK');
                     })
                 }
@@ -135,9 +135,9 @@ module.exports = {
                     var date_update = Date();
                     var update_query = "UPDATE accounts SET firstname = \'" + req.body.firstname + "\', date_update = \'" + date_update + "\' WHERE id = \'" + id + "\';";
                     client.query(update_query, (err, result) => {
+                        done();
                         if (err)
                             return res.status(500).send('Internal Server Error');
-                        done();
                         return res.status(200).send('OK');
                     })
                 }
@@ -161,9 +161,9 @@ module.exports = {
                     var date_update = Date();
                     var update_query = "UPDATE accounts SET mail = \'" + req.body.mail + "\', date_update = \'" + date_update + "\' WHERE id = \'" + id + "\';";
                     client.query(update_query, (err, result) => {
+                        done();
                         if (err)
                             return res.status(500).send('Internal Server Error');
-                        done();
                         return res.status(200).send('OK');
                     })
                 }
@@ -188,9 +188,9 @@ module.exports = {
                     var passwd = await bcrypt.hash(req.body.passwd, 10);
                     var update_query = "UPDATE accounts SET passwd = \'" + passwd + "\', date_update = \'" + date_update + "\' WHERE id = \'" + id + "\';";
                     client.query(update_query, (err, result) => {
+                        done();
                         if (err)
                             return res.status(500).send('Internal Server Error');
-                        done();
                         return res.status(200).send('OK');
                     })
                 }
@@ -214,9 +214,9 @@ module.exports = {
                     var date_update = Date();
                     var update_query = "UPDATE accounts SET datebirth = \'" + req.body.dateBirth + "\', \'" + date_update + "\' WHERE id = \'" + id + "\';";
                     client.query(update_query, (err, result) => {
+                        done();
                         if (err)
                             return res.status(500).send('Internal Server Error');
-                        done();
                         return res.status(200).send('OK');
                     })
                 }
@@ -240,9 +240,9 @@ module.exports = {
                     var date_update = Date();
                     var update_query = "UPDATE accounts SET gender = \'" + req.body.gender + "\', date_update = \'" + date_update + "\' WHERE id = \'" + id + "\';";
                     client.query(update_query, (err, result) => {
+                        done();
                         if (err)
                             return res.status(500).send('Internal Server Error');
-                        done();
                         return res.status(200).send('OK');
                     })
                 }
@@ -266,9 +266,9 @@ module.exports = {
                     var date_update = Date();
                     var update_query = "UPDATE accounts SET description = \'" + req.body.description + "\', date_update = \'" + date_update + "\' WHERE id = \'" + id + "\';";
                     client.query(update_query, (err, result) => {
+                        done();
                         if (err)
                             return res.status(500).send('Internal Server Error');
-                        done();
                         return res.status(200).send('OK');
                     })
                 }
@@ -292,9 +292,9 @@ module.exports = {
                     var date_update = Date();
                     var update_query = "UPDATE accounts SET hashtags = \'" + req.body.hashtags + "\', date_update = \'" + date_update + "\' WHERE id = \'" + id + "\';";
                     client.query(update_query, (err, result) => {
+                        done();
                         if (err)
                             return res.status(500).send('Internal Server Error');
-                        done();
                         return res.status(200).send('OK');
                     })
                 }
@@ -318,9 +318,9 @@ module.exports = {
                     var date_update = Date();
                     var update_query = "UPDATE accounts SET research_hashtags = \'" + req.body.research_hashtags + "\', date_update = \'" + date_update + "\' WHERE id = \'" + id + "\';";
                     client.query(update_query, (err, result) => {
+                        done();
                         if (err)
                             return res.status(500).send('Internal Server Error');
-                        done();
                         return res.status(200).send('OK');
                     })
                 }
@@ -344,9 +344,9 @@ module.exports = {
                     var date_update = Date();
                     var update_query = "UPDATE accounts SET research_perimeter = \'" + req.body.research_perimeter + "\', date_update = \'" + date_update + "\' WHERE id = \'" + id + "\';";
                     client.query(update_query, (err, result) => {
+                        done();
                         if (err)
                             return res.status(500).send('Internal Server Error');
-                        done();
                         return res.status(200).send('OK');
                     })
                 }
@@ -370,9 +370,9 @@ module.exports = {
                     var date_update = Date();
                     var update_query = "UPDATE accounts SET research_gender = \'" + req.body.research_gender + "\', date_update = \'" + date_update + "\' WHERE id = \'" + id + "\';";
                     client.query(update_query, (err, result) => {
+                        done();
                         if (err)
                             return res.status(500).send('Internal Server Error');
-                        done();
                         return res.status(200).send('OK');
                     })
                 }
@@ -396,9 +396,9 @@ module.exports = {
                     var date_update = Date();
                     var update_query = "UPDATE accounts SET research_age_min = \'" + req.body.research_ageMin + "\', date_update = \'" + date_update + "\' WHERE id = \'" + id + "\';";
                     client.query(update_query, (err, result) => {
+                        done();
                         if (err)
                             return res.status(500).send('Internal Server Error');
-                        done();
                         return res.status(200).send('OK');
                     })
                 }
@@ -423,11 +423,11 @@ module.exports = {
                     var date_update = Date();
                     var update_query = "UPDATE accounts SET research_age_max = \'" + req.body.research_ageMax + "\', date_update = \'" + date_update + "\' WHERE id = \'" + id + "\';";
                     client.query(update_query, (err, result) => {
+                        done();
                         if (err)
                             return res.status(500).send('Internal Server Error');
                         if (result == undefined)
                             return res.status(500).send('Internal Server Error');
-                        done();
                         return res.status(200).send('OK');
                     })
                 }
@@ -450,6 +450,7 @@ module.exports = {
                 else if (result.rows[0].token === req.body.token) {
                     var query = "DELETE FROM accounts WHERE id = \'" + id + "\';";
                     client.query(query, (err, result) => {
+                        done();
                         if (err)
                             return res.status(500).send('Internal Server Error');
                         else if (result == undefined)
@@ -463,20 +464,32 @@ module.exports = {
             })
         })
     },
-    // get_params: function (req, res) {
-    //     if (req.body.token == undefined)
-    //         return res.status(400).send('Bad Request');
-    //     pool.connect(function (err, client, done) {
-    //         var id = jwt_decode(req.body.token).id;
-    //         var query = "DELETE FROM accounts WHERE id = \'" + id + "\';";
-    //         client.query(query, (err, result) => {
-    //             if (err)
-    //                 return res.status(500).send('Internal Server Error');
-    //             else if (result == undefined)
-    //                 return res.status(401).send('Unauthorized');
-    //             else
-    //                 return res.status(200).send('OK');
-    //         })
-    //     })
-    // }
+    get_params: function (req, res) {
+        if (req.body.token == undefined)
+            return res.status(400).send('Bad Request');
+        pool.connect(function (err, client, done) {
+            var id = jwt_decode(req.body.token).id;
+            var query = "SELECT token FROM accounts WHERE id = \'" + id + "\';";
+            client.query(query, (err, result) => {
+                if (err)
+                    return res.status(500).send('Internal Server Error');
+                else if (result.rows[0] == undefined)
+                    return res.status(401).send('Unauthorized');
+                else if (result.rows[0].token === req.body.token) {
+                    var query = "SELECT name, firstname, mail, datebirth, gender, description, hashtags, research_age_min, research_age_max, research_gender, research_hashtags FROM accounts WHERE id = " + id + " ;";
+                    client.query(query, (err, result) => {
+                        done();
+                        if (err)
+                            return res.status(500).send('Internal Server Error');
+                        else if (result == undefined)
+                            return res.status(401).send('Unauthorized');
+                        else
+                            return res.status(200).json(result.rows);
+                    })
+                }
+                else
+                    return res.status(401).send('Unauthorized');
+            })
+        })
+    }
 }
