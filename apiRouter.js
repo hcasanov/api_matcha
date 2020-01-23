@@ -3,6 +3,7 @@ const Accounts = require('./routes/accounts');
 const Locations = require('./routes/location');
 const Pictures = require('./routes/pictures');
 const Notifications = require('./routes/notifications');
+// const Chats = require('./routes/chats');
 
 exports.router = (function() {
     var myRouter = express.Router();
@@ -22,7 +23,8 @@ exports.router = (function() {
     myRouter.route('/accounts/research/gender/').put(Accounts.research_gender);
     myRouter.route('/accounts/research/agemin/').put(Accounts.research_ageMin);
     myRouter.route('/accounts/research/agemax/').put(Accounts.research_ageMax);
-    myRouter.route('/accounts/delete/').delete(Accounts.delete);
+    myRouter.route('/accounts/').delete(Accounts.delete);
+    // myRouter.route('/accounts/params').get(Accounts.get_params);
     
     myRouter.route('/accounts/locations').post(Locations.post);
     myRouter.route('/accounts/locations').put(Locations.put);
@@ -36,7 +38,9 @@ exports.router = (function() {
     myRouter.route('/notifications/chat').post(Notifications.new_chat);
     myRouter.route('/notifications/match').post(Notifications.new_match);
     myRouter.route('/notifications/read').put(Notifications.read);
-    myRouter.route('/notifications/:token').get(Notifications.get);
+    myRouter.route('/notifications').get(Notifications.get);
+    
+    // myRouter.route('/chats').get(Chats.get);
 
     return myRouter;
 })();

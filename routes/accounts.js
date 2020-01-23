@@ -78,7 +78,7 @@ module.exports = {
                     bcrypt.compare(req.body.passwd, found.passwd, function (err, result) {
                         if (result) {
                             var token = JWT.generateTokenLogin(found.id);
-                            client.query("UPDATE accounts SET token = \'" + token + "\';", function(err){
+                            client.query("UPDATE accounts SET token = \'" + token + "\';", function (err) {
                                 done();
                                 return res.status(202).json({
                                     '_id': found.id,
@@ -342,7 +342,7 @@ module.exports = {
                     return res.status(401).send('Unauthorized');
                 else if (result.rows[0].token === req.body.token) {
                     var date_update = Date();
-                    var update_query = "UPDATE accounts SET research_perimeter = \'" + req.body.research_perimeter + "\', date_update = \'" + date_update + "\' WHERE id = \'" + id + "\';";
+                    var update_query = "UPDATE accounts SET research_perimeter = \'" + req.body.research_perimeter + "\', date_update = \'" + date_update + "\' WHERE id = \'" + id + "\';";
                     client.query(update_query, (err, result) => {
                         if (err)
                             return res.status(500).send('Internal Server Error');
@@ -441,15 +441,42 @@ module.exports = {
             return res.status(400).send('Bad Request');
         pool.connect(function (err, client, done) {
             var id = jwt_decode(req.body.token).id;
-            var query = "DELETE FROM accounts WHERE id = \'" + id + "\';";
+            var query = "SELECT token FROM accounts WHERE id = \'" + id + "\';";
             client.query(query, (err, result) => {
                 if (err)
                     return res.status(500).send('Internal Server Error');
-                else if (result == undefined)
+                else if (result.rows[0] == undefined)
                     return res.status(401).send('Unauthorized');
+                else if (result.rows[0].token === req.body.token) {
+                    var query = "DELETE FROM accounts WHERE id = \'" + id + "\';";
+                    client.query(query, (err, result) => {
+                        if (err)
+                            return res.status(500).send('Internal Server Error');
+                        else if (result == undefined)
+                            return res.status(401).send('Unauthorized');
+                        else
+                            return res.status(200).send('OK');
+                    })
+                }
                 else
-                    return res.status(200).send('OK');
+                    return res.status(401).send('Unauthorized');
             })
         })
-    }
+    },
+    // get_params: function (req, res) {
+    //     if (req.body.token == undefined)
+    //         return res.status(400).send('Bad Request');
+    //     pool.connect(function (err, client, done) {
+    //         var id = jwt_decode(req.body.token).id;
+    //         var query = "DELETE FROM accounts WHERE id = \'" + id + "\';";
+    //         client.query(query, (err, result) => {
+    //             if (err)
+    //                 return res.status(500).send('Internal Server Error');
+    //             else if (result == undefined)
+    //                 return res.status(401).send('Unauthorized');
+    //             else
+    //                 return res.status(200).send('OK');
+    //         })
+    //     })
+    // }
 }
