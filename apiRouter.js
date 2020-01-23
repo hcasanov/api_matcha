@@ -4,6 +4,7 @@ const Locations = require('./routes/location');
 const Pictures = require('./routes/pictures');
 const Notifications = require('./routes/notifications');
 const Chats = require('./routes/chats');
+const Likes = require('./routes/likes');
 
 exports.router = (function() {
     var myRouter = express.Router();
@@ -42,6 +43,8 @@ exports.router = (function() {
     
     myRouter.route('/chats').post(Chats.post);
     myRouter.route('/chats').get(Chats.get);
+    
+    myRouter.route('/likes').post(Likes.post);
 
     return myRouter;
 })();

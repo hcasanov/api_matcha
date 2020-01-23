@@ -71,11 +71,11 @@ module.exports = {
             })
         })
     },
-    new_match: function (req, res) {
-        var from_id = req.body.from_id;
-        var to_id = req.body.to_id;
+    new_match: function (req) {
+        var from_id = req.from_id;
+        var to_id = req.to_id;
         var type = "match";
-        var match_id = req.body.match_id;
+        var match_id = req.match_id;
         var name = "Someone like you";
 
         pool.connect(function (err, client, done) {
@@ -89,10 +89,10 @@ module.exports = {
                 done();
                 if (err) {
                     console.log(err);
-                    return res.status(500)
+                    return 'ERROR'
                 }
                 else
-                    res.status(200).send('OK');
+                    return 'OK'
             })
         })
     },
