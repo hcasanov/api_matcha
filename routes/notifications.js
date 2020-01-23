@@ -166,11 +166,10 @@ module.exports = {
                     var update_query = "SELECT id, name, message, status FROM notifications WHERE to_id = " + id + " ORDER BY date_created DESC;";
                     client.query(update_query, (err, result) => {
                         done();
-                        return console.log(result)
                         if (err)
                             return res.status(500).send('Internal Server Error');
                         else
-                            return res.status(200).send('OK');
+                            return res.status(200).json(result.rows);
                     })
                 }
                 else
