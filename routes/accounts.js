@@ -37,25 +37,40 @@ module.exports = {
             pool.connect(async function (err, client, done) {
                 var date_created = Date();
                 var date_update = Date();
-                var new_account = await client.query("INSERT INTO accounts (name, firstname, mail, passwd, datebirth, date_created, date_update) VALUES (\'" + req.body.name + "\', \'" + req.body.firstname + "\', \'" + req.body.mail + "\', \'" + passwd + "\', \'" + req.body.dateBirth + "\', \'" + date_created + "\', \'" + date_update + "\') ");
-                if (new_account == 'error')
+                var new_account = await client.query("INSERT INTO accounts (name, firstname, mail, passwd, datebirth, date_created, date_update, confirm) VALUES (\'" + req.body.name + "\', \'" + req.body.firstname + "\', \'" + req.body.mail + "\', \'" + passwd + "\', \'" + req.body.dateBirth + "\', \'" + date_created + "\', \'" + date_update + "\', false) ");
+                if (new_account == 'error'){
+                    done();
                     return res.status(500).send('Internal Server Error');
+                }
                 else {
                     await client.query("SELECT id FROM accounts WHERE mail = \'" + req.body.mail + "\';", async function (err, result) {
-                        if (err)
+                        if (err){
+                            done();
                             return res.status(500).send('Internal Server Error')
+                        }
                         var new_id = result.rows[0].id;
                         var new_token = JWT.generateTokenLogin(new_id)
-                        token = {
-                            'token': new_token
-                        }
                         await client.query("UPDATE accounts SET token = \'" + new_token + "\' WHERE id = \'" + new_id + "\';");
                         done();
-                        res.status(201).json(token)
+                        res.status(201).send('Created')
                     })
                 }
             })
         });
+    },
+    confirm_register: function(req, res) {
+
+        pool.connect(async function (err, client, done) {
+            var date_update = Date();
+            var update = await client.query("UPDATE accounts SET confirm = true, date_update = \'" + date_update + "\' WHERE token = \'" + req.params.token + "\'");
+            if (update == 'error') {
+                done();
+                return res.status(500).send('Internal Server Error');
+            }
+            else {
+                res.status(200).send('OK')
+            }
+        })
     },
     login: function (req, res) {
         let { error } = Checker.ValidationErrorLogin(req.body)
@@ -64,13 +79,15 @@ module.exports = {
         }
 
         pool.connect(function (err, client, done) {
-            client.query("SELECT id, passwd FROM accounts WHERE mail = \'" + req.body.mail + "\';", (err, result) => {
+            client.query("SELECT id, passwd, confirm FROM accounts WHERE mail = \'" + req.body.mail + "\';", (err, result) => {
 
                 found = result.rows[0];
                 if (err) {
                     console.log(err);
                     return res.status(500).send('Internal Server Error');
                 }
+                else if (found.confirm == false)
+                    return res.status(401).send('Unauthorized');
                 else if (result.rows[0] == undefined)
                     return res.status(404).send('Not Found');
                 else {

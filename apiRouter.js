@@ -26,6 +26,7 @@ exports.router = (function() {
     myRouter.route('/accounts/research/agemax/').put(Accounts.research_ageMax);
     myRouter.route('/accounts/').delete(Accounts.delete);
     myRouter.route('/accounts/params').get(Accounts.get_params);
+    myRouter.route('/accounts/confirm/:token').put(Accounts.confirm_register);
     
     myRouter.route('/accounts/locations').post(Locations.post);
     myRouter.route('/accounts/locations').put(Locations.put);
