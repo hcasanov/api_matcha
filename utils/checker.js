@@ -1,4 +1,13 @@
 const Joi = require('@hapi/joi');
+const pg = require('pg');
+
+const config = {
+    user: process.env.SQL_USER,
+    host: process.env.SQL_HOST,
+    database: process.env.SQL_DATABASE,
+    port: process.env.SQL_POT
+};
+const pool = new pg.Pool(config);
 
 module.exports = {
     ValidationError: function (message) {
@@ -9,18 +18,6 @@ module.exports = {
             'passwd': Joi.string().pattern(new RegExp('^(?=.*[A-Z])')).required(), // Min 5 caracteres, min 1 alpha, min 1 num
             'repeatPasswd': Joi.ref('passwd'),
             'dateBirth': Joi.required(),
-            'gender': Joi.string().required(),
-            'description': Joi.string().required(),
-            'picturesProfilePicture': Joi.required(),
-            'picturesOtherPictures': Joi.required(),
-            'researchParametersHastags': Joi.required(),
-            'researchParametersPerimeter': Joi.required(),
-            'researchParametersMyLatitude': Joi.required(),
-            'researchParametersMyLongitude': Joi.required(),
-            'researchParametersAgeMin': Joi.number().integer().required(),
-            'researchParametersAgeMax': Joi.number().integer().required(),
-            'researchParametersGender': Joi.required(),
-            'metaOnline': Joi.required()
         })
         return Schema.validate(message);
     },
@@ -63,7 +60,7 @@ module.exports = {
     ValidationErrorLogin: function (message) {
         const Schema = Joi.object().keys({
             'mail': Joi.string().email({ minDomainSegments: 2 }).required(),
-            'passwd': Joi.string().required(),
+            'passwd': Joi.string().required()
         })
         return Schema.validate(message);
     },
@@ -88,5 +85,19 @@ module.exports = {
     },
     arrayHashtags: function (req) {
         return (req.split(','));
+    },
+    accountExist: function(mail, callback){
+        pool.connect(function(err, client, done){
+            client.query("SELECT id FROM accounts WHERE mail = \'" + mail + "\';", (err, result) => {
+                done();
+                if (err){
+                    console.log(err);
+                }
+                else if (result.rows[0] == undefined)
+                    callback(false);
+                else
+                    callback(true);
+            })
+        })
     }
-}
+}   
