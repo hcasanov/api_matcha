@@ -1,4 +1,5 @@
 const pg = require('pg');
+const jwt_decode = require('jwt-decode');
 
 const config = {
     user: process.env.SQL_USER,
@@ -9,18 +10,57 @@ const config = {
 const pool = new pg.Pool(config);
 
 module.exports = {
-    get_cible: function(from, callback) {
-        pool.connect(function(err, client, done) {
-            if (err)
-                callback(err);
+    get: function (req, res) {
+        pool.connect(function (err, client, done) {
+            if (err){
+                done()
+                res.status(500).send('Internal Server Error')
+            }
             else {
-                var query = "SELECT * FROM accounts WHERE (age BETWEEN " + from.research_age_min + " AND " + from.research_age_max + ") AND gender = \'" + from.research_gender + "\' AND blocked = false AND id != " + from.id + ""
+                var id = jwt_decode(req.body.token).id;
+                var query = "SELECT token FROM accounts WHERE id = \'" + id + "\';";
                 client.query(query, (err, result) => {
-                    if (err)
-                        callback(err);
-                    else {
-                        callback(result);
+                    if (err){
+                        done()
+                        return res.status(500).send('Internal Server Error');
                     }
+                    else if (result == undefined){
+                        done()
+                        return res.status(401).send('Unauthorized');
+                    }
+                    else if (result.rows[0].token === req.body.token) {
+                        var query = "Select * FROM accounts WHERE id = " + id + ";"
+                        client.query(query, (err, result) => {
+                            if (err){
+                                done()
+                                res.status(500).send('Internal Server Error')
+                            }
+                            else if (result.rows[0] == undefined){
+                                done()
+                                res.status(400).send('Bad Request')
+                            }
+                            else {
+                                var research_age_min = result.rows[0].research_age_min
+                                var research_age_max = result.rows[0].research_age_max
+                                var research_gender = result.rows[0].research_gender
+                                var gender = result.rows[0].gender
+                                var id = result.rows[0].id
+                                var query = "SELECT * FROM accounts WHERE (age BETWEEN " + research_age_min + " AND " + research_age_max + ") AND gender = \'" + research_gender + "\' AND blocked = false AND research_gender = \'" + gender + "\' AND id != " + id + ""
+                                client.query(query, (err, result) => {
+                                    if (err){
+                                        done()
+                                        res.status(500).send('Internal Server Error')
+                                    }
+                                    else {
+                                        done()
+                                        
+                                    }
+                                })
+                            }
+                        })
+                    }
+                    else
+                        return res.status(401).send('Unauthorized');
                 })
             }
         })
