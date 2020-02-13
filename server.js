@@ -13,4 +13,13 @@ app.use(body.urlencoded({extended: true}))
 app.use(body.json())
 app.use('/', myRouter)
 app.use(cors());
+
+app.use(function (req, res, next) {
+    res.setHeader('Access-Control-Allow-Origin', 'http://localhost:3000');
+    res.setHeader('Access-Control-Allow-Methods', 'POST, GET, DELETE, PUT');
+    res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type');
+    res.setHeader('Access-Control-Allow-Credentials', true);
+    next();
+});
+
 app.listen(process.env.LISTEN_PORT)
