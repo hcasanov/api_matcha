@@ -6,23 +6,23 @@ const config = {
     user: process.env.SQL_USER,
     host: process.env.SQL_HOST,
     database: process.env.SQL_DATABASE,
-    port: process.env.SQL_POT
+    port: process.env.SQL_PORT
 };
 const pool = new pg.Pool(config);
 
 module.exports = {
     post: function(req, res){
-        if (req.body.token == undefined || req.body.to_id == undefined)
+        if (req.headers.token == undefined || req.body.to_id == undefined)
             return res.status(400).send('Bad Request');
         pool.connect(function (err, client, done) {
-            var id = jwt_decode(req.body.token).id;
+            var id = jwt_decode(req.headers.token).id;
             var query = "SELECT token FROM accounts WHERE id = \'" + id + "\';";
             client.query(query, (err, result) => {
                 if (err)
                     return res.status(500).send('Internal Server Error');
                 else if (result == undefined)
                     return res.status(401).send('Unauthorized');
-                else if (result.rows[0].token === req.body.token) {
+                else if (result.rows[0].token === req.headers.token) {
                     var date_created = Date();
                     var update_query = "INSERT INTO likes (from_id, to_id, date_created, status) VALUES (" + id + ", " + req.body.to_id + ", \'" + date_created + "\', true);";
                     client.query(update_query, (err, result) => {

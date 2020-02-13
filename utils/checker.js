@@ -5,7 +5,7 @@ const config = {
     user: process.env.SQL_USER,
     host: process.env.SQL_HOST,
     database: process.env.SQL_DATABASE,
-    port: process.env.SQL_POT
+    port: process.env.SQL_PORT
 };
 const pool = new pg.Pool(config);
 
@@ -17,6 +17,7 @@ module.exports = {
             'mail': Joi.string().email({ minDomainSegments: 2 }).required(),
             'passwd': Joi.string().pattern(new RegExp('^(?=.*[A-Z])')).required(), // Min 5 caracteres, min 1 alpha, min 1 num
             'repeatPasswd': Joi.ref('passwd'),
+            'gender': Joi.string(),
             'dateBirth': Joi.required(),
         })
         return Schema.validate(message);
@@ -30,7 +31,6 @@ module.exports = {
             'passwd': Joi.string().pattern(new RegExp('^(?=.*[A-Z])')), // Min 5 caracteres, min 1 alpha, min 1 num
             'repeatPasswd': Joi.ref('passwd'),
             'dateBirth': Joi.date(),
-            'gender': Joi.string(),
             'description': Joi.string(),
             'picturesProfilePicture': Joi.string(),
             'picturesOtherPictures': Joi.string(),

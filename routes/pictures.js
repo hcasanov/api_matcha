@@ -5,23 +5,23 @@ const config = {
     user: process.env.SQL_USER,
     host: process.env.SQL_HOST,
     database: process.env.SQL_DATABASE,
-    port: process.env.SQL_POT
+    port: process.env.SQL_PORT
 };
 const pool = new pg.Pool(config);
 
 module.exports = {
     post: function (req, res) {
-        if (req.body.token == undefined || req.body.url_picture == undefined)
+        if (req.headers.token == undefined || req.body.url_picture == undefined)
             return res.status(400).send('Bad Request');
         pool.connect(function (err, client, done) {
-            var id = jwt_decode(req.body.token).id;
+            var id = jwt_decode(req.headers.token).id;
             var query = "SELECT token FROM accounts WHERE id = \'" + id + "\';";
             client.query(query, (err, result) => {
                 if (err != null)
                     return res.status(500).send('Internal Server Error');
                 else if (result.rows[0] === undefined)
                     return res.status(401).send('Unauthorized');
-                else if (result.rows[0].token === req.body.token) {
+                else if (result.rows[0].token === req.headers.token) {
                     var date_created = new Date();
                     var url = req.body.url_picture;
                     var file_name = url.split('/').reverse();
@@ -40,17 +40,17 @@ module.exports = {
         })
     },
     get: function (req, res) {
-        if (req.body.token == undefined)
+        if (req.headers.token == undefined)
             return res.status(400).send('Bad Request');
         pool.connect(function (err, client, done) {
-            var id = jwt_decode(req.body.token).id;
+            var id = jwt_decode(req.headers.token).id;
             var query = "SELECT token FROM accounts WHERE id = \'" + id + "\';";
             client.query(query, (err, result) => {
                 if (err != null)
                     return res.status(500).send('Internal Server Error');
                 else if (result.rows[0] === undefined)
                     return res.status(401).send('Unauthorized');
-                else if (result.rows[0].token === req.body.token) {
+                else if (result.rows[0].token === req.headers.token) {
                     var update_query = "SELECT url_picture FROM pictures WHERE id_account = \'" + id + "\';";
                     client.query(update_query, (err, result) => {
                         done();
@@ -67,17 +67,17 @@ module.exports = {
         })
     },
     delete: function (req, res) {
-        if (req.body.token == undefined || req.body.url_picture == undefined)
+        if (req.headers.token == undefined || req.body.url_picture == undefined)
             return res.status(400).send('Bad Request');
         pool.connect(function (err, client, done) {
-            var id = jwt_decode(req.body.token).id;
+            var id = jwt_decode(req.headers.token).id;
             var query = "SELECT token FROM accounts WHERE id = \'" + id + "\';";
             client.query(query, (err, result) => {
                 if (err != null)
                     return res.status(500).send('Internal Server Error');
                 else if (result.rows[0] === undefined)
                     return res.status(401).send('Unauthorized');
-                else if (result.rows[0].token === req.body.token) {
+                else if (result.rows[0].token === req.headers.token) {
                     var update_query = "DELETE FROM pictures WHERE url_picture = \'" + req.body.url_picture + "\'";
                     client.query(update_query, (err, result) => {
                         done();

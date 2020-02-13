@@ -10,7 +10,7 @@ const config = {
     user: process.env.SQL_USER,
     host: process.env.SQL_HOST,
     database: process.env.SQL_DATABASE,
-    port: process.env.SQL_POT
+    port: process.env.SQL_PORT
 };
 const pool = new pg.Pool(config);
 
@@ -60,7 +60,7 @@ module.exports = {
                                 if (err){
                                     res.status(500).send('Internal Server Error')
                                 }
-                                send_mail(token_confirm, req)
+                                // send_mail(token_confirm, req)
                             })
                           });
                     })
@@ -88,22 +88,21 @@ module.exports = {
             return res.status(403).send(error.details[0].message);
         }
 
-        if(Checker.accountExist(req.body.mail), function(res) {
-            if(res === false)
-                return res.status(401).send('Unauthorized');
-        })
+        // if(Checker.accountExist(req.body.mail), function(res) {
+        //     if(res === false)
+        //         return res.status(401).send('Unauthorized');
+        // })
         pool.connect(function (err, client, done) {
             client.query("SELECT id, passwd, confirm FROM accounts WHERE mail = \'" + req.body.mail + "\';", (err, result) => {
-
                 found = result.rows[0];
                 if (err) {
                     console.log(err);
                     return res.status(500).send('Internal Server Error');
                 }
+                else if (found == undefined)
+                    return res.status(404).send('Not Found');
                 else if (found.confirm == false)
                     return res.status(401).send('Unauthorized');
-                else if (result.rows[0] == undefined)
-                    return res.status(404).send('Not Found');
                 else {
                     bcrypt.compare(req.body.passwd, found.passwd, function (err, result) {
                         if (result) {
@@ -125,17 +124,17 @@ module.exports = {
         })
     },
     name: async function (req, res) {
-        if (req.body.token == undefined || req.body.name == undefined)
+        if (req.headers.token == undefined || req.body.name == undefined)
             return res.status(400).send('Bad Request');
         pool.connect(function (err, client, done) {
-            var id = jwt_decode(req.body.token).id;
+            var id = jwt_decode(req.headers.token).id;
             var query = "SELECT token FROM accounts WHERE id = \'" + id + "\';";
             client.query(query, (err, result) => {
                 if (err)
                     return res.status(500).send('Internal Server Error');
                 else if (result == undefined)
                     return res.status(401).send('Unauthorized');
-                else if (result.rows[0].token === req.body.token) {
+                else if (result.rows[0].token === req.headers.token) {
                     var date_update = Date();
                     var update_query = "UPDATE accounts SET name = \'" + req.body.name + "\', date_update = \'" + date_update + "\' WHERE id = \'" + id + "\';";
                     client.query(update_query, (err, result) => {
@@ -151,17 +150,17 @@ module.exports = {
         })
     },
     firstname: function (req, res) {
-        if (req.body.token == undefined || req.body.firstname == undefined)
+        if (req.headers.token == undefined || req.body.firstname == undefined)
             return res.status(400).send('Bad Request');
         pool.connect(function (err, client, done) {
-            var id = jwt_decode(req.body.token).id;
+            var id = jwt_decode(req.headers.token).id;
             var query = "SELECT token FROM accounts WHERE id = \'" + id + "\';";
             client.query(query, (err, result) => {
                 if (err)
                     return res.status(500).send('Internal Server Error');
                 else if (result == undefined)
                     return res.status(401).send('Unauthorized');
-                else if (result.rows[0].token === req.body.token) {
+                else if (result.rows[0].token === req.headers.token) {
                     var date_update = Date();
                     var update_query = "UPDATE accounts SET firstname = \'" + req.body.firstname + "\', date_update = \'" + date_update + "\' WHERE id = \'" + id + "\';";
                     client.query(update_query, (err, result) => {
@@ -177,17 +176,17 @@ module.exports = {
         })
     },
     mail: function (req, res) {
-        if (req.body.token == undefined || req.body.mail == undefined)
+        if (req.headers.token == undefined || req.body.mail == undefined)
             return res.status(400).send('Bad Request');
         pool.connect(function (err, client, done) {
-            var id = jwt_decode(req.body.token).id;
+            var id = jwt_decode(req.headers.token).id;
             var query = "SELECT token FROM accounts WHERE id = \'" + id + "\';";
             client.query(query, (err, result) => {
                 if (err)
                     return res.status(500).send('Internal Server Error');
                 else if (result == undefined)
                     return res.status(401).send('Unauthorized');
-                else if (result.rows[0].token === req.body.token) {
+                else if (result.rows[0].token === req.headers.token) {
                     var date_update = Date();
                     var update_query = "UPDATE accounts SET mail = \'" + req.body.mail + "\', date_update = \'" + date_update + "\' WHERE id = \'" + id + "\';";
                     client.query(update_query, (err, result) => {
@@ -203,17 +202,17 @@ module.exports = {
         })
     },
     passwd: function (req, res) {
-        if (req.body.token == undefined || req.body.passwd == undefined)
+        if (req.headers.token == undefined || req.body.passwd == undefined)
             return res.status(400).send('Bad Request');
         pool.connect(async function (err, client, done) {
-            var id = await jwt_decode(req.body.token).id;
+            var id = await jwt_decode(req.headers.token).id;
             var query = "SELECT token FROM accounts WHERE id = \'" + id + "\';";
             client.query(query, async (err, result) => {
                 if (err)
                     return res.status(500).send('Internal Server Error');
                 else if (result == undefined)
                     return res.status(401).send('Unauthorized');
-                else if (result.rows[0].token === req.body.token) {
+                else if (result.rows[0].token === req.headers.token) {
                     var date_update = Date();
                     var passwd = await bcrypt.hash(req.body.passwd, 10);
                     var update_query = "UPDATE accounts SET passwd = \'" + passwd + "\', date_update = \'" + date_update + "\' WHERE id = \'" + id + "\';";
@@ -230,17 +229,17 @@ module.exports = {
         })
     },
     dateBirth: function (req, res) {
-        if (req.body.token == undefined || req.body.dateBirth == undefined)
+        if (req.headers.token == undefined || req.body.dateBirth == undefined)
             return res.status(400).send('Bad Request');
         pool.connect(function (err, client, done) {
-            var id = jwt_decode(req.body.token).id;
+            var id = jwt_decode(req.headers.token).id;
             var query = "SELECT token FROM accounts WHERE id = \'" + id + "\';";
             client.query(query, (err, result) => {
                 if (err)
                     return res.status(500).send('Internal Server Error');
                 else if (result == undefined)
                     return res.status(401).send('Unauthorized');
-                else if (result.rows[0].token === req.body.token) {
+                else if (result.rows[0].token === req.headers.token) {
                     var date_update = Date();
                     var update_query = "UPDATE accounts SET datebirth = \'" + req.body.dateBirth + "\', \'" + date_update + "\' WHERE id = \'" + id + "\';";
                     client.query(update_query, (err, result) => {
@@ -256,17 +255,17 @@ module.exports = {
         })
     },
     gender: function (req, res) {
-        if (req.body.token == undefined || req.body.gender == undefined)
+        if (req.headers.token == undefined || req.body.gender == undefined)
             return res.status(400).send('Bad Request');
         pool.connect(function (err, client, done) {
-            var id = jwt_decode(req.body.token).id;
+            var id = jwt_decode(req.headers.token).id;
             var query = "SELECT token FROM accounts WHERE id = \'" + id + "\';";
             client.query(query, (err, result) => {
                 if (err)
                     return res.status(500).send('Internal Server Error');
                 else if (result == undefined)
                     return res.status(401).send('Unauthorized');
-                else if (result.rows[0].token === req.body.token) {
+                else if (result.rows[0].token === req.headers.token) {
                     var date_update = Date();
                     var update_query = "UPDATE accounts SET gender = \'" + req.body.gender + "\', date_update = \'" + date_update + "\' WHERE id = \'" + id + "\';";
                     client.query(update_query, (err, result) => {
@@ -282,17 +281,17 @@ module.exports = {
         })
     },
     description: function (req, res) {
-        if (req.body.token == undefined || req.body.description == undefined)
+        if (req.headers.token == undefined || req.body.description == undefined)
             return res.status(400).send('Bad Request');
         pool.connect(function (err, client, done) {
-            var id = jwt_decode(req.body.token).id;
+            var id = jwt_decode(req.headers.token).id;
             var query = "SELECT token FROM accounts WHERE id = \'" + id + "\';";
             client.query(query, (err, result) => {
                 if (err)
                     return res.status(500).send('Internal Server Error');
                 else if (result == undefined)
                     return res.status(401).send('Unauthorized');
-                else if (result.rows[0].token === req.body.token) {
+                else if (result.rows[0].token === req.headers.token) {
                     var date_update = Date();
                     var update_query = "UPDATE accounts SET description = \'" + req.body.description + "\', date_update = \'" + date_update + "\' WHERE id = \'" + id + "\';";
                     client.query(update_query, (err, result) => {
@@ -308,17 +307,17 @@ module.exports = {
         })
     },
     hashtags: function (req, res) {
-        if (req.body.token == undefined || req.body.hashtags == undefined)
+        if (req.headers.token == undefined || req.body.hashtags == undefined)
             return res.status(400).send('Bad Request');
         pool.connect(function (err, client, done) {
-            var id = jwt_decode(req.body.token).id;
+            var id = jwt_decode(req.headers.token).id;
             var query = "SELECT token FROM accounts WHERE id = \'" + id + "\';";
             client.query(query, (err, result) => {
                 if (err)
                     return res.status(500).send('Internal Server Error');
                 else if (result == undefined)
                     return res.status(401).send('Unauthorized');
-                else if (result.rows[0].token === req.body.token) {
+                else if (result.rows[0].token === req.headers.token) {
                     var date_update = Date();
                     var update_query = "UPDATE accounts SET hashtags = \'" + req.body.hashtags + "\', date_update = \'" + date_update + "\' WHERE id = \'" + id + "\';";
                     client.query(update_query, (err, result) => {
@@ -334,17 +333,17 @@ module.exports = {
         })
     },
     research_hashtags: function (req, res) {
-        if (req.body.token == undefined || req.body.research_hashtags == undefined)
+        if (req.headers.token == undefined || req.body.research_hashtags == undefined)
             return res.status(400).send('Bad Request');
         pool.connect(function (err, client, done) {
-            var id = jwt_decode(req.body.token).id;
+            var id = jwt_decode(req.headers.token).id;
             var query = "SELECT token FROM accounts WHERE id = \'" + id + "\';";
             client.query(query, (err, result) => {
                 if (err)
                     return res.status(500).send('Internal Server Error');
                 else if (result == undefined)
                     return res.status(401).send('Unauthorized');
-                else if (result.rows[0].token === req.body.token) {
+                else if (result.rows[0].token === req.headers.token) {
                     var date_update = Date();
                     var update_query = "UPDATE accounts SET research_hashtags = \'" + req.body.research_hashtags + "\', date_update = \'" + date_update + "\' WHERE id = \'" + id + "\';";
                     client.query(update_query, (err, result) => {
@@ -360,17 +359,17 @@ module.exports = {
         })
     },
     research_perimeter: function (req, res) {
-        if (req.body.token == undefined || req.body.research_perimeter == undefined)
+        if (req.headers.token == undefined || req.body.research_perimeter == undefined)
             return res.status(400).send('Bad Request');
         pool.connect(function (err, client, done) {
-            var id = jwt_decode(req.body.token).id;
+            var id = jwt_decode(req.headers.token).id;
             var query = "SELECT token FROM accounts WHERE id = \'" + id + "\';";
             client.query(query, (err, result) => {
                 if (err)
                     return res.status(500).send('Internal Server Error');
                 else if (result == undefined)
                     return res.status(401).send('Unauthorized');
-                else if (result.rows[0].token === req.body.token) {
+                else if (result.rows[0].token === req.headers.token) {
                     var date_update = Date();
                     var update_query = "UPDATE accounts SET research_perimeter = \'" + req.body.research_perimeter + "\', date_update = \'" + date_update + "\' WHERE id = \'" + id + "\';";
                     client.query(update_query, (err, result) => {
@@ -386,17 +385,17 @@ module.exports = {
         })
     },
     research_gender: function (req, res) {
-        if (req.body.token == undefined || req.body.research_gender == undefined)
+        if (req.headers.token == undefined || req.body.research_gender == undefined)
             return res.status(400).send('Bad Request');
         pool.connect(function (err, client, done) {
-            var id = jwt_decode(req.body.token).id;
+            var id = jwt_decode(req.headers.token).id;
             var query = "SELECT token FROM accounts WHERE id = \'" + id + "\';";
             client.query(query, (err, result) => {
                 if (err)
                     return res.status(500).send('Internal Server Error');
                 else if (result == undefined)
                     return res.status(401).send('Unauthorized');
-                else if (result.rows[0].token === req.body.token) {
+                else if (result.rows[0].token === req.headers.token) {
                     var date_update = Date();
                     var update_query = "UPDATE accounts SET research_gender = \'" + req.body.research_gender + "\', date_update = \'" + date_update + "\' WHERE id = \'" + id + "\';";
                     client.query(update_query, (err, result) => {
@@ -412,17 +411,17 @@ module.exports = {
         })
     },
     research_ageMin: function (req, res) {
-        if (req.body.token == undefined || req.body.research_ageMin == undefined)
+        if (req.headers.token == undefined || req.body.research_ageMin == undefined)
             return res.status(400).send('Bad Request');
         pool.connect(function (err, client, done) {
-            var id = jwt_decode(req.body.token).id;
+            var id = jwt_decode(req.headers.token).id;
             var query = "SELECT token FROM accounts WHERE id = \'" + id + "\';";
             client.query(query, (err, result) => {
                 if (err)
                     return res.status(500).send('Internal Server Error');
                 else if (result.rows[0] == undefined)
                     return res.status(401).send('Unauthorized');
-                else if (result.rows[0].token === req.body.token) {
+                else if (result.rows[0].token === req.headers.token) {
                     var date_update = Date();
                     var update_query = "UPDATE accounts SET research_age_min = \'" + req.body.research_ageMin + "\', date_update = \'" + date_update + "\' WHERE id = \'" + id + "\';";
                     client.query(update_query, (err, result) => {
@@ -438,10 +437,10 @@ module.exports = {
         })
     },
     research_ageMax: function (req, res) {
-        if (req.body.token == undefined || req.body.research_ageMax == undefined)
+        if (req.headers.token == undefined || req.body.research_ageMax == undefined)
             return res.status(400).send('Bad Request');
         pool.connect(function (err, client, done) {
-            var id = jwt_decode(req.body.token).id;
+            var id = jwt_decode(req.headers.token).id;
             var query = "SELECT token FROM accounts WHERE id = \'" + id + "\';";
             client.query(query, (err, result) => {
                 console.log(id)
@@ -449,7 +448,7 @@ module.exports = {
                     return res.status(500).send('Internal Server Error');
                 else if (result.rows[0] == undefined)
                     return res.status(401).send('Unauthorized');
-                else if (result.rows[0].token === req.body.token) {
+                else if (result.rows[0].token === req.headers.token) {
                     var date_update = Date();
                     var update_query = "UPDATE accounts SET research_age_max = \'" + req.body.research_ageMax + "\', date_update = \'" + date_update + "\' WHERE id = \'" + id + "\';";
                     client.query(update_query, (err, result) => {
@@ -467,17 +466,17 @@ module.exports = {
         })
     },
     delete: function (req, res) {
-        if (req.body.token == undefined)
+        if (req.headers.token == undefined)
             return res.status(400).send('Bad Request');
         pool.connect(function (err, client, done) {
-            var id = jwt_decode(req.body.token).id;
+            var id = jwt_decode(req.headers.token).id;
             var query = "SELECT token FROM accounts WHERE id = \'" + id + "\';";
             client.query(query, (err, result) => {
                 if (err)
                     return res.status(500).send('Internal Server Error');
                 else if (result.rows[0] == undefined)
                     return res.status(401).send('Unauthorized');
-                else if (result.rows[0].token === req.body.token) {
+                else if (result.rows[0].token === req.headers.token) {
                     var query = "DELETE FROM accounts WHERE id = \'" + id + "\';";
                     client.query(query, (err, result) => {
                         done();
@@ -495,17 +494,17 @@ module.exports = {
         })
     },
     get_params: function (req, res) {
-        if (req.body.token == undefined)
+        if (req.headers.token == undefined)
             return res.status(400).send('Bad Request');
         pool.connect(function (err, client, done) {
-            var id = jwt_decode(req.body.token).id;
+            var id = jwt_decode(req.headers.token).id;
             var query = "SELECT token FROM accounts WHERE id = \'" + id + "\';";
             client.query(query, (err, result) => {
                 if (err)
                     return res.status(500).send('Internal Server Error');
                 else if (result.rows[0] == undefined)
                     return res.status(401).send('Unauthorized');
-                else if (result.rows[0].token === req.body.token) {
+                else if (result.rows[0].token === req.headers.token) {
                     var query = "SELECT name, firstname, mail, datebirth, gender, description, hashtags, research_age_min, research_age_max, research_gender, research_hashtags FROM accounts WHERE id = " + id + " ;";
                     client.query(query, (err, result) => {
                         done();

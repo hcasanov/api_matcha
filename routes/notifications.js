@@ -5,7 +5,7 @@ const config = {
     user: process.env.SQL_USER,
     host: process.env.SQL_HOST,
     database: process.env.SQL_DATABASE,
-    port: process.env.SQL_POT
+    port: process.env.SQL_PORT
 };
 const pool = new pg.Pool(config);
 
@@ -125,17 +125,17 @@ module.exports = {
         })
     },
     read: function (req, res) {
-        if (req.body.token == undefined || req.body.id_notification == undefined)
+        if (req.headers.token == undefined || req.body.id_notification == undefined)
             return res.status(400).send('Bad Request');
         pool.connect(function (err, client, done) {
-            var id = jwt_decode(req.body.token).id;
+            var id = jwt_decode(req.headers.token).id;
             var query = "SELECT token FROM accounts WHERE id = \'" + id + "\';";
             client.query(query, (err, result) => {
                 if (err != null)
                     return res.status(500).send('Internal Server Error');
                 else if (result.rows[0] === undefined)
                     return res.status(401).send('Unauthorized');
-                else if (result.rows[0].token === req.body.token) {
+                else if (result.rows[0].token === req.headers.token) {
                     var date_update = new Date();
                     var update_query = "UPDATE notifications SET status = false, date_update = \'" + date_update + "\' WHERE id = " + req.body.id_notification + ";";
                     client.query(update_query, (err, result) => {
@@ -152,17 +152,17 @@ module.exports = {
         })
     },
     get: function (req, res) {
-        if (req.body.token == undefined)
+        if (req.headers.token == undefined)
             return res.status(400).send('Bad Request');
         pool.connect(function (err, client, done) {
-            var id = jwt_decode(req.body.token).id;
+            var id = jwt_decode(req.headers.token).id;
             var query = "SELECT token FROM accounts WHERE id = \'" + id + "\';";
             client.query(query, (err, result) => {
                 if (err != null)
                     return res.status(500).send('Internal Server Error');
                 else if (result.rows[0] === undefined)
                     return res.status(401).send('Unauthorized');
-                else if (result.rows[0].token === req.body.token) {
+                else if (result.rows[0].token === req.headers.token) {
                     var update_query = "SELECT id, name, message, status FROM notifications WHERE to_id = " + id + " ORDER BY date_created DESC;";
                     client.query(update_query, (err, result) => {
                         done();

@@ -5,7 +5,7 @@ const config = {
     user: process.env.SQL_USER,
     host: process.env.SQL_HOST,
     database: process.env.SQL_DATABASE,
-    port: process.env.SQL_POT
+    port: process.env.SQL_PORT
 };
 const pool = new pg.Pool(config);
 
@@ -17,7 +17,7 @@ module.exports = {
                 res.status(500).send('Internal Server Error')
             }
             else {
-                var id = jwt_decode(req.body.token).id;
+                var id = jwt_decode(req.headers.token).id;
                 var query = "SELECT token FROM accounts WHERE id = \'" + id + "\';";
                 client.query(query, (err, result) => {
                     if (err){
@@ -28,7 +28,7 @@ module.exports = {
                         done()
                         return res.status(401).send('Unauthorized');
                     }
-                    else if (result.rows[0].token === req.body.token) {
+                    else if (result.rows[0].token === req.headers.token) {
                         var query = "Select * FROM accounts WHERE id = " + id + ";"
                         client.query(query, (err, result) => {
                             if (err){
@@ -45,11 +45,20 @@ module.exports = {
                                 var research_gender = result.rows[0].research_gender
                                 var gender = result.rows[0].gender
                                 var id = result.rows[0].id
-                                var query = "SELECT * FROM accounts \
+                                if(research_gender === 'M' || research_gender === 'F'){
+                                    var query = "SELECT * FROM accounts \
                                             WHERE (age BETWEEN " + research_age_min + " AND " + research_age_max + ") \
                                             AND gender = \'" + research_gender + "\' AND research_gender = \'" + gender + "\' \
                                             AND blocked = false \
-                                            AND id != " + id + ";"// QUERY ne prend pas en compte si la perosnne recherche tous les sexes, je n'ai pas voulu de faire 2 requetes avec un if research_gender = All
+                                            AND id != " + id + ";"
+                                }
+                                else {
+                                    var query = "SELECT * FROM accounts \
+                                            WHERE (age BETWEEN " + research_age_min + " AND " + research_age_max + ") \
+                                            AND research_gender = 'A' \
+                                            AND blocked = false \
+                                            AND id != " + id + ";"
+                                }
                                 client.query(query, (err, result) => {
                                     if (err){
                                         done()
