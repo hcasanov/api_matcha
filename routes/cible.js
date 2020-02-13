@@ -45,7 +45,11 @@ module.exports = {
                                 var research_gender = result.rows[0].research_gender
                                 var gender = result.rows[0].gender
                                 var id = result.rows[0].id
-                                var query = "SELECT * FROM accounts WHERE (age BETWEEN " + research_age_min + " AND " + research_age_max + ") AND gender = \'" + research_gender + "\' AND blocked = false AND research_gender = \'" + gender + "\' AND id != " + id + ""
+                                var query = "SELECT * FROM accounts \
+                                            WHERE (age BETWEEN " + research_age_min + " AND " + research_age_max + ") \
+                                            AND gender = \'" + research_gender + "\' AND research_gender = \'" + gender + "\' \
+                                            AND blocked = false \
+                                            AND id != " + id + ";"// QUERY ne prend pas en compte si la perosnne recherche tous les sexes, je n'ai pas voulu de faire 2 requetes avec un if research_gender = All
                                 client.query(query, (err, result) => {
                                     if (err){
                                         done()

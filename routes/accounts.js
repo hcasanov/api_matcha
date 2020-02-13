@@ -1,9 +1,10 @@
 const bcrypt = require('bcrypt');
 const JWT = require('../utils/jwt');
 const jwt_decode = require('jwt-decode');
-const nodemailer = require('nodemailer');
+const send_mail = require('../utils/sendMail');
 const Checker = require('../utils/checker');
 const pg = require('pg');
+const crypto = require('crypto');
 
 const config = {
     user: process.env.SQL_USER,
@@ -51,8 +52,17 @@ module.exports = {
                         var new_id = result.rows[0].id;
                         var new_token = JWT.generateTokenLogin(new_id)
                         await client.query("UPDATE accounts SET token = \'" + new_token + "\' WHERE id = \'" + new_id + "\';");
-                        done();
-                        res.status(201).send('Created')
+                        crypto.randomBytes(15, (err, buf) => {
+                            if (err) throw err;
+                            var token_confirm = buf.toString('hex')
+                            client.query("UPDATE accounts SET token_confirm = \'" + token_confirm + "\' WHERE id = \'" + new_id + "\'", (err, result) => {
+                                done()
+                                if (err){
+                                    res.status(500).send('Internal Server Error')
+                                }
+                                send_mail(token_confirm, req)
+                            })
+                          });
                     })
                 }
             })
