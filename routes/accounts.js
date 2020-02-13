@@ -88,6 +88,10 @@ module.exports = {
             return res.status(403).send(error.details[0].message);
         }
 
+        if(Checker.accountExist(req.body.mail), function(res) {
+            if(res === false)
+                return res.status(401).send('Unauthorized');
+        })
         pool.connect(function (err, client, done) {
             client.query("SELECT id, passwd, confirm FROM accounts WHERE mail = \'" + req.body.mail + "\';", (err, result) => {
 
