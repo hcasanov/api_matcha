@@ -37,7 +37,7 @@ module.exports = {
             pool.connect(async function (err, client, done) {
                 var date_created = Date();
                 var date_update = Date();
-                var new_account = await client.query("INSERT INTO accounts (name, firstname, mail, passwd, datebirth, date_created, date_update, confirm) VALUES (\'" + req.body.name + "\', \'" + req.body.firstname + "\', \'" + req.body.mail + "\', \'" + passwd + "\', \'" + req.body.dateBirth + "\', \'" + date_created + "\', \'" + date_update + "\', false); ");
+                var new_account = await client.query("INSERT INTO accounts (name, firstname, mail, passwd, datebirth, gender, date_created, date_update, confirm) VALUES (\'" + req.body.name + "\', \'" + req.body.firstname + "\', \'" + req.body.mail + "\', \'" + passwd + "\', \'" + req.body.dateBirth + "\', \'" + req.body.gender + "\', \'" + date_created + "\', \'" + date_update + "\', false); ");
                 if (new_account == 'error'){
                     done();
                     return res.status(500).send('Internal Server Error');
