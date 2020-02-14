@@ -22,13 +22,12 @@ module.exports = {
         if (error) {
             return res.status(403).send(error.details[0].message)
         }
-
         if (!Checker.isAdult(req.body.dateBirth))
             return res.status(403).send("Too young to subscribe");
-
+        
         if (!Checker.checkPasswd(req.body.passwd, req.body.repeatPasswd))
             return res.status(403).send("Incorrect password");
-
+            
         Checker.accountExist(req.body.mail, async function (result) {
             if (result)
                 return res.status(400).send('Account already exist')
@@ -38,7 +37,7 @@ module.exports = {
             pool.connect(async function (err, client, done) {
                 var date_created = Date();
                 var date_update = Date();
-                var new_account = await client.query("INSERT INTO accounts (name, firstname, mail, passwd, datebirth, date_created, date_update, confirm) VALUES (\'" + req.body.name + "\', \'" + req.body.firstname + "\', \'" + req.body.mail + "\', \'" + passwd + "\', \'" + req.body.dateBirth + "\', \'" + date_created + "\', \'" + date_update + "\', false) ");
+                var new_account = await client.query("INSERT INTO accounts (name, firstname, mail, passwd, datebirth, date_created, date_update, confirm) VALUES (\'" + req.body.name + "\', \'" + req.body.firstname + "\', \'" + req.body.mail + "\', \'" + passwd + "\', \'" + req.body.dateBirth + "\', \'" + date_created + "\', \'" + date_update + "\', false); ");
                 if (new_account == 'error'){
                     done();
                     return res.status(500).send('Internal Server Error');
@@ -60,6 +59,7 @@ module.exports = {
                                 if (err){
                                     res.status(500).send('Internal Server Error')
                                 }
+                                return res.status(200).send('OK')
                                 // send_mail(token_confirm, req)
                             })
                           });
@@ -512,8 +512,11 @@ module.exports = {
                             return res.status(500).send('Internal Server Error');
                         else if (result == undefined)
                             return res.status(401).send('Unauthorized');
-                        else
+                        else{
+                            var tab_hashtags = result.rows[0].hashtags.split(',');
+                            result.rows[0].hashtags = tab_hashtags;
                             return res.status(200).json(result.rows);
+                        }
                     })
                 }
                 else
