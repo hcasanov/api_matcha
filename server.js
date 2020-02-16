@@ -9,10 +9,10 @@ require('dotenv').config();
 let app = express();
 
 // Start server
+app.use(cors());
 app.use(body.urlencoded({extended: true}))
 app.use(body.json())
 app.use('/', myRouter)
-app.use(cors());
 
 app.use(function (req, res, next) {
     res.setHeader('Access-Control-Allow-Origin', 'http://localhost:3000');

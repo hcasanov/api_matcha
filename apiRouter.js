@@ -37,6 +37,9 @@ exports.router = (function() {
     myRouter.route('/accounts/pictures').get(Pictures.get);
     myRouter.route('/accounts/pictures').delete(Pictures.delete);
 
+    myRouter.route('/upload/profilePicture').post(Pictures.profilePicture);     //new functions to upload pictures
+    myRouter.route('/upload/profilePicture').put(Pictures.profilePicture);
+
     myRouter.route('/notifications/like').post(Notifications.new_like);
     myRouter.route('/notifications/chat').post(Notifications.new_chat);
     myRouter.route('/notifications/match').post(Notifications.new_match);
@@ -49,6 +52,8 @@ exports.router = (function() {
     myRouter.route('/likes').post(Likes.post);
 
     myRouter.route('/cibles').get(Cibles.get);
+
+
 
     return myRouter;
 })();

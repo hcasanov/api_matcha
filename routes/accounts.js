@@ -57,7 +57,7 @@ module.exports = {
                             client.query("UPDATE accounts SET token_confirm = \'" + token_confirm + "\' WHERE id = \'" + new_id + "\'", (err, result) => {
                                 done()
                                 if (err){
-                                    res.status(500).send('Internal Server Error')
+                                    return  res.status(500).send('Internal Server Error')
                                 }
                                 return res.status(200).send('OK')
                                 // send_mail(token_confirm, req)
@@ -385,6 +385,7 @@ module.exports = {
         })
     },
     research_gender: function (req, res) {
+      // return res.status(400).send(req.body.research_gender);
         if (req.headers.token == undefined || req.body.research_gender == undefined)
             return res.status(400).send('Bad Request');
         pool.connect(function (err, client, done) {
@@ -411,7 +412,7 @@ module.exports = {
         })
     },
     research_ageMin: function (req, res) {
-        if (req.headers.token == undefined || req.body.research_ageMin == undefined)
+        if (req.headers.token == undefined || req.body.research_age_min == undefined)
             return res.status(400).send('Bad Request');
         pool.connect(function (err, client, done) {
             var id = jwt_decode(req.headers.token).id;
@@ -423,7 +424,7 @@ module.exports = {
                     return res.status(401).send('Unauthorized');
                 else if (result.rows[0].token === req.headers.token) {
                     var date_update = Date();
-                    var update_query = "UPDATE accounts SET research_age_min = \'" + req.body.research_ageMin + "\', date_update = \'" + date_update + "\' WHERE id = \'" + id + "\';";
+                    var update_query = "UPDATE accounts SET research_age_min = \'" + req.body.research_age_min + "\', date_update = \'" + date_update + "\' WHERE id = \'" + id + "\';";
                     client.query(update_query, (err, result) => {
                         done();
                         if (err)
@@ -437,7 +438,7 @@ module.exports = {
         })
     },
     research_ageMax: function (req, res) {
-        if (req.headers.token == undefined || req.body.research_ageMax == undefined)
+        if (req.headers.token == undefined || req.body.research_age_max == undefined)
             return res.status(400).send('Bad Request');
         pool.connect(function (err, client, done) {
             var id = jwt_decode(req.headers.token).id;
@@ -450,7 +451,7 @@ module.exports = {
                     return res.status(401).send('Unauthorized');
                 else if (result.rows[0].token === req.headers.token) {
                     var date_update = Date();
-                    var update_query = "UPDATE accounts SET research_age_max = \'" + req.body.research_ageMax + "\', date_update = \'" + date_update + "\' WHERE id = \'" + id + "\';";
+                    var update_query = "UPDATE accounts SET research_age_max = \'" + req.body.research_age_max + "\', date_update = \'" + date_update + "\' WHERE id = \'" + id + "\';";
                     client.query(update_query, (err, result) => {
                         done();
                         if (err)
@@ -505,7 +506,7 @@ module.exports = {
                 else if (result.rows[0] == undefined)
                     return res.status(401).send('Unauthorized');
                 else if (result.rows[0].token === req.headers.token) {
-                    var query = "SELECT name, firstname, mail, datebirth, gender, description, hashtags, research_age_min, research_age_max, research_gender, research_hashtags FROM accounts WHERE id = " + id + " ;";
+                    var query = "SELECT name, firstname, mail, datebirth, gender, description, hashtags, research_age_min, research_age_max, research_gender, research_hashtags, research_age_min, research_age_max FROM accounts WHERE id = " + id + " ;";
                     client.query(query, (err, result) => {
                         done();
                         if (err)
@@ -513,8 +514,10 @@ module.exports = {
                         else if (result == undefined)
                             return res.status(401).send('Unauthorized');
                         else{
+                          if (result.rows[0].hashtags) {
                             var tab_hashtags = result.rows[0].hashtags.split(',');
                             result.rows[0].hashtags = tab_hashtags;
+                          }
                             return res.status(200).json(result.rows);
                         }
                     })
