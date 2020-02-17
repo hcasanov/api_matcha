@@ -513,8 +513,10 @@ module.exports = {
                         else if (result == undefined)
                             return res.status(401).send('Unauthorized');
                         else{
-                            var tab_hashtags = result.rows[0].hashtags.split(',');
-                            result.rows[0].hashtags = tab_hashtags;
+                            if (result.rows[0].hashtags != undefined){
+                                var tab_hashtags = result.rows[0].hashtags.split(',');
+                                result.rows[0].hashtags = tab_hashtags;
+                            }
                             return res.status(200).json(result.rows);
                         }
                     })
