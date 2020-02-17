@@ -12,6 +12,7 @@ const pool = new pg.Pool(config);
 module.exports = {
     ValidationError: function (message) {
         const Schema = Joi.object().keys({
+            'login': Joi.string().min(2).max(50).required(),
             'name': Joi.string().min(2).max(15).required(),
             'firstname': Joi.string().min(2).max(15).required(),
             'mail': Joi.string().email({ minDomainSegments: 2 }).required(),
@@ -25,6 +26,7 @@ module.exports = {
     ValidationErrorParam: function (message) {
         const Schema = Joi.object().keys({
             '_id': Joi.string(),
+            'login': Joi.string().min(2).max(50),
             'name': Joi.string().min(2).max(15),
             'firstname': Joi.string().min(2).max(15),
             'mail': Joi.string().email({ minDomainSegments: 2 }),
