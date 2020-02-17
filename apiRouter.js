@@ -12,6 +12,7 @@ exports.router = (function() {
 
     myRouter.route('/accounts/register/').post(Accounts.register);// Create account
     myRouter.route('/accounts/login/').post(Accounts.login);
+    myRouter.route('/accounts/userLogin/').put(Accounts.userLogin);
     myRouter.route('/accounts/name/').put(Accounts.name);
     myRouter.route('/accounts/firstname/').put(Accounts.firstname);
     myRouter.route('/accounts/mail/').put(Accounts.mail);
