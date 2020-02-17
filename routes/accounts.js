@@ -88,10 +88,6 @@ module.exports = {
             return res.status(403).send(error.details[0].message);
         }
 
-        // if(Checker.accountExist(req.body.mail), function(res) {
-        //     if(res === false)
-        //         return res.status(401).send('Unauthorized');
-        // })
         pool.connect(function (err, client, done) {
             client.query("SELECT id, passwd, confirm FROM accounts WHERE mail = \'" + req.body.mail + "\';", (err, result) => {
                 found = result.rows[0];
@@ -137,6 +133,32 @@ module.exports = {
                 else if (result.rows[0].token === req.headers.token) {
                     var date_update = Date();
                     var update_query = "UPDATE accounts SET name = \'" + req.body.name + "\', date_update = \'" + date_update + "\' WHERE id = \'" + id + "\';";
+                    client.query(update_query, (err, result) => {
+                        done();
+                        if (err)
+                            return res.status(500).send('Internal Server Error');
+                        return res.status(200).send('OK');
+                    })
+                }
+                else
+                    return res.status(401).send('Unauthorized');
+            })
+        })
+    },
+    userLogin: async function (req, res) {
+        if (req.headers.token == undefined || req.body.login == undefined)
+            return res.status(400).send('Bad Request');
+        pool.connect(function (err, client, done) {
+            var id = jwt_decode(req.headers.token).id;
+            var query = "SELECT token FROM accounts WHERE id = \'" + id + "\';";
+            client.query(query, (err, result) => {
+                if (err)
+                    return res.status(500).send('Internal Server Error');
+                else if (result == undefined)
+                    return res.status(401).send('Unauthorized');
+                else if (result.rows[0].token === req.headers.token) {
+                    var date_update = Date();
+                    var update_query = "UPDATE accounts SET login = \'" + req.body.login + "\', date_update = \'" + date_update + "\' WHERE id = \'" + id + "\';";
                     client.query(update_query, (err, result) => {
                         done();
                         if (err)
