@@ -527,7 +527,7 @@ module.exports = {
                 else if (result.rows[0] == undefined)
                     return res.status(401).send('Unauthorized');
                 else if (result.rows[0].token === req.headers.token) {
-                    var query = "SELECT name, firstname, mail, datebirth, gender, description, hashtags, research_age_min, research_age_max, research_gender, research_hashtags FROM accounts WHERE id = " + id + " ;";
+                    var query = "SELECT name, firstname, mail, datebirth, gender, description, age, hashtags, research_perimeter, research_age_min, research_age_max, research_gender, research_hashtags FROM accounts WHERE id = " + id + " ;";
                     client.query(query, (err, result) => {
                         done();
                         if (err)
