@@ -20,6 +20,8 @@ module.exports = {
             'repeatPasswd': Joi.ref('passwd'),
             'gender': Joi.string(),
             'dateBirth': Joi.required(),
+            'latitude': Joi.required(),
+            'longitude': Joi.required(),
         })
         return Schema.validate(message);
     },

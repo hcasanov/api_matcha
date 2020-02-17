@@ -30,7 +30,6 @@ exports.router = (function() {
     myRouter.route('/accounts/params').get(Accounts.get_params);
     myRouter.route('/accounts/confirm/:token').put(Accounts.confirm_register);
     
-    myRouter.route('/accounts/locations').post(Locations.post);
     myRouter.route('/accounts/locations').put(Locations.put);
     myRouter.route('/accounts/locations').get(Locations.get);
 

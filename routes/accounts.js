@@ -37,8 +37,9 @@ module.exports = {
             pool.connect(async function (err, client, done) {
                 var date_created = Date();
                 var date_update = Date();
-                var new_account = await client.query("INSERT INTO accounts (name, firstname, mail, passwd, datebirth, gender, date_created, date_update, confirm) VALUES (\'" + req.body.name + "\', \'" + req.body.firstname + "\', \'" + req.body.mail + "\', \'" + passwd + "\', \'" + req.body.dateBirth + "\', \'" + req.body.gender + "\', \'" + date_created + "\', \'" + date_update + "\', false); ");
-                if (new_account == 'error'){
+                var new_account = await client.query("INSERT INTO accounts (login, name, firstname, mail, passwd, datebirth, gender, date_created, date_update, confirm) VALUES (\'" + req.body.login + "\', \'" + req.body.name + "\', \'" + req.body.firstname + "\', \'" + req.body.mail + "\', \'" + passwd + "\', \'" + req.body.dateBirth + "\', \'" + req.body.gender + "\', \'" + date_created + "\', \'" + date_update + "\', false); ");
+                var new_location = await client.query("INSERT INTO locations (latitude, longitude, date_created, date_update) VALUES (\'" + req.body.latitude + "\', \'" + req.body.longitude + "\', \'" + date_created + "\', \'" + date_update + "\'); ");
+                if (new_account == 'error' || new_location == 'error'){
                     done();
                     return res.status(500).send('Internal Server Error');
                 }

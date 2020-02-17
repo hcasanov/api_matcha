@@ -10,33 +10,6 @@ const config = {
 const pool = new pg.Pool(config);
 
 module.exports = {
-    post: function(req, res){
-        if (req.headers.token == undefined || req.body.latitude == undefined || req.body.longitude == undefined)
-            return res.status(400).send('Bad Request');
-        pool.connect(function(err, client, done) {
-            var id = jwt_decode(req.headers.token).id;
-            var query = "SELECT token FROM accounts WHERE id = \'" + id + "\';";
-            client.query(query, (err, result) => {
-                if (err != null)
-                    return res.status(500).send('Internal Server Error');
-                else if (result.rows[0] === undefined)
-                    return res.status(401).send('Unauthorized');
-                else if (result.rows[0].token === req.headers.token){
-                    var date_created = new Date();
-                    var date_update = new Date();
-                    var update_query = "INSERT INTO locations (id, longitude, latitude, date_created, date_update) VALUES (\'" + id + "\', \'" + req.body.longitude + "\', \'" + req.body.latitude + "\', \'" + date_created + "\', \'" + date_update + "\');";
-                    client.query(update_query, (err, result) => {
-                        done();
-                        if (err)
-                            return res.status(500).send('Internal Server Error');
-                        return res.status(200).send('OK');
-                    })
-                }
-                else
-                    return res.status(401).send('Unauthorized');
-            })
-        })
-    },
     put: function(req, res){
         if (req.headers.token == undefined || req.body.latitude == undefined || req.body.longitude == undefined)
             return res.status(400).send('Bad Request');
