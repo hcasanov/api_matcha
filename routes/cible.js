@@ -96,11 +96,11 @@ module.exports = {
                                                 client.query(select_user, async (err, result) => {
                                                     if (err)
                                                         return res.status(500).send('Internal Server Error')
-                                                    return res.status(400).json(result.rows)
+                                                    return res.status(200).json(result.rows)
                                                 })
                                             }
                                             else {
-                                                return res.status(400).json({})  
+                                                return res.status(200).json({})  
                                             }
                                         }
                                     })

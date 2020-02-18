@@ -16,7 +16,7 @@ const pool = new pg.Pool(config);
 
 module.exports = {
     register: async function (req, res) {
-
+        console.log(req.body)
         // Parsing
         let { error } = Checker.ValidationError(req.body);
         if (error) {
@@ -528,7 +528,7 @@ module.exports = {
                 else if (result.rows[0] == undefined)
                     return res.status(401).send('Unauthorized');
                 else if (result.rows[0].token === req.headers.token) {
-                    var query = "SELECT name, firstname, mail, datebirth, gender, description, age, hashtags, research_perimeter, research_age_min, research_age_max, research_gender, research_hashtags FROM accounts WHERE id = " + id + " ;";
+                    var query = "SELECT id, login, name, firstname, mail, datebirth, gender, description, age, hashtags, research_perimeter, research_age_min, research_age_max, research_gender, research_hashtags FROM accounts WHERE id = " + id + " ;";
                     client.query(query, (err, result) => {
                         done();
                         if (err)
