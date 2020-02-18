@@ -48,9 +48,9 @@ module.exports = {
                 else if (result.rows[0] === undefined)
                     return res.status(401).send('Unauthorized');
                 else if (result.rows[0].token === req.headers.token){
-                    var update_query = "SELECT from_id, to_id, message, date_created FROM chats WHERE from_id = " + id + " AND to_id = " + req.headers.to_id + " ORDER BY date_created DESC;";
-                    console.log(update_query)
+                    var update_query = "SELECT from_id, to_id, message, date_created FROM chats WHERE (from_id = " + id + " AND to_id = " + req.headers.to_id + ") OR (from_id = " + req.headers.to_id + " AND to_id = " + id + ") ORDER BY date_created DESC;";
                     client.query(update_query, (err, result) => {
+                        console.log(result)
                         done();
                         if (err)
                             return res.status(500).send('Internal Server Error');
