@@ -33,7 +33,30 @@ function create_users (){
     var dateBirth = "12/12/12";
 
     while (i) {
-        database.query("INSERT INTO accounts (name, firstname, mail, passwd, dateBirth, age, gender, description, hashtags, research_age_min, research_age_max, research_gender, date_created, date_update, confirm) VALUES (" + i + ", " + i + ", \'" + i + "@gmail.com\', \'" + i + "Test12\', " + dateBirth + ", 22, 'F', 'Mauris pretium molestie enim, tincidunt volutpat ligula accumsan at. Donec ullamcorper hendrerit dapibus. Integer feugiat in nisi vel maximus. Aliquam erat volutpat. Suspendisse potenti. Ut ultrices maximus lobortis', 'cuise,sport,code,foot', 20, 24, 'F', " + dateBirth + ", " + dateBirth + ", true)");
+        var age = Math.floor(Math.random() * (30 - 20 + 1)) + 18;
+        var research_age_max = Math.floor(Math.random() * (30 - 25 + 1)) + 25;
+        var research_age_min = Math.floor(Math.random() * (24 - 18 + 1)) + 18;
+        
+        if ((i % 2) === 0)
+            var gender = 'F';
+        else
+            var gender = 'M';
+
+        if ((i % 7) === 0)
+            var research_gender = 'A';
+        else if ((i % 10) === 0)
+            var research_gender = 'M';
+        else if ((i % 2) === 0)
+            var research_gender = 'M';
+        else
+            var research_gender = 'F';
+
+        if ((i % 3) === 0)
+            var gender = 'F'
+        else
+            var gender = 'M'
+
+        database.query("INSERT INTO accounts (login, name, firstname, mail, passwd, dateBirth, age, gender, description, hashtags, research_age_min, research_age_max, research_gender, date_created, date_update, confirm) VALUES (" + i + ", " + i + ", " + i + ", \'" + i + "@gmail.com\', \'" + i + "Test12\', " + dateBirth + ", " + age + ", \'" + gender + "\', 'Mauris pretium molestie enim, tincidunt volutpat ligula accumsan at. Donec ullamcorper hendrerit dapibus. Integer feugiat in nisi vel maximus. Aliquam erat volutpat. Suspendisse potenti. Ut ultrices maximus lobortis', 'cuise,sport,code,foot', " + research_age_min + ", " + research_age_max + ", \'" + research_gender + "\', " + dateBirth + ", " + dateBirth + ", true)");
         i--;
     }
     if (i == 0)
