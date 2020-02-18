@@ -37,7 +37,7 @@ module.exports = {
         })
     },
     get: function(req, res) {
-        if (req.headers.token == undefined || req.body.from_id == undefined || req.body.to_id == undefined)
+        if (req.headers.token == undefined || req.headers.to_id == undefined)
             return res.status(400).send('Bad Request');
         pool.connect(function(err, client, done) {
             var id = jwt_decode(req.headers.token).id;
@@ -48,7 +48,8 @@ module.exports = {
                 else if (result.rows[0] === undefined)
                     return res.status(401).send('Unauthorized');
                 else if (result.rows[0].token === req.headers.token){
-                    var update_query = "SELECT from_id, to_id, message, date_created FROM chats WHERE from_id = " + req.body.from_id + " AND to_id = " + req.body.to_id + " ORDER BY date_created DESC;";
+                    var update_query = "SELECT from_id, to_id, message, date_created FROM chats WHERE from_id = " + id + " AND to_id = " + req.headers.to_id + " ORDER BY date_created DESC;";
+                    console.log(update_query)
                     client.query(update_query, (err, result) => {
                         done();
                         if (err)

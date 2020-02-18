@@ -25,6 +25,8 @@ function init(){
     database.query("CREATE TABLE IF NOT EXISTS notifications (id SERIAL PRIMARY KEY NOT NULL, type VARCHAR(50), like_id INT, chat_id INT, match_id INT, name VARCHAR(150), message TEXT, from_id INT, to_id INT, status BOOLEAN, date_created VARCHAR(100), date_update VARCHAR(100))\;");
     database.query("CREATE TABLE IF NOT EXISTS likes (id SERIAL PRIMARY KEY NOT NULL, from_id INT, to_id INT, date_created VARCHAR(100), status BOOLEAN)\;");
     database.query("CREATE TABLE IF NOT EXISTS matchs (id SERIAL PRIMARY KEY NOT NULL, from_id INT, to_id INT, date_created VARCHAR(100), status BOOLEAN)\;");
+    database.query("CREATE TABLE IF NOT EXISTS chats (id SERIAL PRIMARY KEY NOT NULL, from_id INT, to_id INT, message TEXT, date_created VARCHAR(100))\;");
+
 }
 
 function create_users (){
