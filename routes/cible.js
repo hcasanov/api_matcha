@@ -92,13 +92,13 @@ module.exports = {
                                                     else
                                                         list_id = list_id + " " + tab[el][1]
                                                 }
-                                                var select_user = "SELECT accounts.id, accounts.login, accounts.name, accounts.firstname, accounts.age, accounts.description, accounts.hashtags, locations.longitude, locations.latitude FROM accounts JOIN locations ON accounts.id = locations.id WHERE accounts.id IN (" + list_id + ");"
+                                                var select_user = "SELECT accounts.id, accounts.login, accounts.last_connection, accounts.name, accounts.firstname, accounts.age, accounts.description, accounts.hashtags, locations.longitude, locations.latitude FROM accounts JOIN locations ON accounts.id = locations.id WHERE accounts.id IN (" + list_id + ");"
+                                                console.log(select_user)
                                                 client.query(select_user, async (err, result) => {
                                                     if (err)
                                                         return res.status(500).send('Internal Server Error')
                                                     if (result.rows[0] === undefined)
                                                         return res.status(200).json([])
-
                                                     var response = []
                                                     for (const index in result.rows){
 
@@ -127,7 +127,8 @@ module.exports = {
                                                             description: result.rows[index].description,
                                                             location: response_location.rows[0],
                                                             pictures: list_picture,
-                                                            profilePicture: profilePicture
+                                                            profilePicture: profilePicture,
+                                                            lastConnection: result.rows[index].last_connection
                                                         }
                                                         response.push(user)
                                                     }
