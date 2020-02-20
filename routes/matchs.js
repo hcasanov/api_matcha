@@ -89,8 +89,14 @@ module.exports = {
                                         var pictures = await client.query(query_pictures)
                                         var locations = await client.query(query_location)
 
-                                        console.log(pictures.rows)
-                                        // console.log(locations.rows)
+                                        var list_picture = []
+                                        var profilePicture = ""
+                                        for (const i in pictures.rows){
+                                            if (pictures.rows[i].profile_picture == false)
+                                                list_picture.push(pictures.rows[i].url)
+                                            else
+                                                profilePicture = pictures.rows[i].url
+                                        }
 
                                         var user = {
                                             id: result.rows[index].id,
@@ -101,7 +107,8 @@ module.exports = {
                                             hashtags: result.rows[index].hashtags,
                                             description: result.rows[index].description,
                                             location: locations.rows[0],
-                                            pictures: pictures.rows
+                                            pictures: list_picture,
+                                            profilePicture: profilePicture
                                         }
                                         response.push(user)
                                     }
