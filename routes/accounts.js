@@ -99,12 +99,12 @@ module.exports = {
                 else if (found == undefined)
                     return res.status(404).send('Not Found');
                 else if (found.confirm == false)
-                    return res.status(401).send('Unauthorized');
+                    return res.status(401).send('Unauthorizeds');
                 else {
                     bcrypt.compare(req.body.passwd, found.passwd, function (err, result) {
                         if (result) {
                             var token = JWT.generateTokenLogin(found.id);
-                            client.query("UPDATE accounts SET token = \'" + token + "\';", function (err) {
+                            client.query("UPDATE accounts SET token = \'" + token + "\', online = true;", function (err) {
                                 done();
                                 return res.status(202).json({
                                     '_id': found.id,
@@ -541,6 +541,34 @@ module.exports = {
                                 result.rows[0].hashtags = tab_hashtags;
                             }
                             return res.status(200).json(result.rows);
+                        }
+                    })
+                }
+                else
+                    return res.status(401).send('Unauthorized');
+            })
+        })
+    },
+    disconnect: function (req, res) {
+        if (req.headers.token == undefined)
+            return res.status(400).send('Bad Request');
+        pool.connect(function (err, client, done) {
+            var id = jwt_decode(req.headers.token).id;
+            var query = "SELECT token FROM accounts WHERE id = \'" + id + "\';";
+            client.query(query, (err, result) => {
+                if (err)
+                    return res.status(500).send('Internal Server Error');
+                else if (result.rows[0] == undefined)
+                    return res.status(401).send('Unauthorized');
+                else if (result.rows[0].token === req.headers.token) {
+                    var lastConnection = new Date()
+                    var query = "UPDATE accounts SET online = false, last_connection = \'" + lastConnection + "\' WHERE id = " + id + ";"
+                    console.log(query)
+                    client.query(query, (err, result) => {
+                        if (err)
+                            return res.status(500).send('Internal Server Error')
+                        else {
+                            return res.status(200).send('Disconnected')
                         }
                     })
                 }

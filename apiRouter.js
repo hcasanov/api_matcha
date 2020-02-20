@@ -56,5 +56,7 @@ exports.router = (function() {
 
     myRouter.route('/cibles').get(Cibles.get);
 
+    myRouter.route('/disconnect').post(Accounts.disconnect);
+
     return myRouter;
 })();
