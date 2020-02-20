@@ -6,6 +6,7 @@ const Notifications = require('./routes/notifications');
 const Chats = require('./routes/chats');
 const Likes = require('./routes/likes');
 const Cibles = require('./routes/cible');
+const Matchs = require('./routes/matchs')
 
 exports.router = (function() {
     var myRouter = express.Router();
@@ -50,6 +51,8 @@ exports.router = (function() {
     myRouter.route('/chats').get(Chats.get);
     
     myRouter.route('/likes').post(Likes.post);
+
+    myRouter.route('/matchs').get(Matchs.get);
 
     myRouter.route('/cibles').get(Cibles.get);
 
