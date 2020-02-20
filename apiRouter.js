@@ -34,8 +34,11 @@ exports.router = (function() {
     myRouter.route('/accounts/locations').get(Locations.get);
 
     myRouter.route('/accounts/pictures').post(Pictures.post);
-    myRouter.route('/accounts/pictures').get(Pictures.get);
+    myRouter.route('/accounts/pictures').get(Pictures.get);                         //get pictures except profile picture
     myRouter.route('/accounts/pictures').delete(Pictures.delete);
+    myRouter.route('/accounts/profilePicture').post(Pictures.profilePicture);        //new function to add profile picture
+    myRouter.route('/accounts/getProfilePicture').get(Pictures.getProfilePicture);
+
 
     myRouter.route('/notifications/like').post(Notifications.new_like);
     myRouter.route('/notifications/chat').post(Notifications.new_chat);
