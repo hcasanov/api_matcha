@@ -43,5 +43,79 @@ module.exports = {
                 })
             })
         })
+    },
+    get: function(req, res){
+        if (req.headers.token == undefined)
+            return res.status(400).send('Bad Request');
+        pool.connect(function(err, client, done) {
+            var id = jwt_decode(req.headers.token).id;
+            var query = "SELECT token FROM accounts WHERE id = \'" + id + "\';";
+            client.query(query, (err, result) => {
+                if (err)
+                    return res.status(500).send('Internal Server Error');
+                else if (result.rows[0] == undefined)
+                    return res.status(401).send('Unauthorized');
+                else if (result.rows[0].token === req.headers.token){
+                    var get_query = "SELECT * FROM matchs WHERE (from_id = " + id + ") OR (to_id = " + id + ")";
+                    client.query(get_query, (err, result) => {
+                        if (err)
+                            return res.status(500).send('Internal Server Error');
+                        var list_matchs = ""
+                        if (result.rows[0] != undefined){
+                            for (const index in result.rows){
+                                if (result.rows[index].from_id != id){
+                                    if (list_matchs === "")
+                                        list_matchs = result.rows[index].from_id
+                                    else
+                                        list_matchs = list_matchs + ", " + result.rows[index].from_id
+                                } else {
+                                    if (list_matchs === "")
+                                        list_matchs = result.rows[index].to_id
+                                    else
+                                        list_matchs = list_matchs + ", " + result.rows[index].to_id
+                                }
+                            }
+                            // var select_matchs_query = "SELECT accounts.id, accounts.login, accounts.firstname, accounts.name, accounts.age, accounts.hashtags, accounts.description, locations.latitude, locations.longitude, pictures.url, pictures.profile_picture FROM accounts JOIN pictures ON accounts.id = pictures.id_account JOIN locations ON accounts.id = locations.id WHERE accounts.id IN (" + list_matchs + ");"
+                            var select_matchs_query = "SELECT id, login, name, firstname, age, hashtags, description FROM accounts WHERE id IN (" + list_matchs + ");"
+                            client.query(select_matchs_query, async (err, result) => {
+                                if (err)
+                                    return res.status(500).send('Internal Server Error');
+                                if (result.rows[0] != undefined){
+                                    var response = []
+                                    for (const index in result.rows){
+                                        var query_pictures = "SELECT url, profile_picture FROM pictures WHERE id_account = " + result.rows[index].id + ";"
+                                        var query_location = "SELECT latitude, longitude FROM locations WHERE id = " + result.rows[index].id + ";"
+
+                                        var pictures = await client.query(query_pictures)
+                                        var locations = await client.query(query_location)
+
+                                        console.log(pictures.rows)
+                                        // console.log(locations.rows)
+
+                                        var user = {
+                                            id: result.rows[index].id,
+                                            login: result.rows[index].login,
+                                            name: result.rows[index].name,
+                                            firstname: result.rows[index].firstname,
+                                            age: result.rows[index].age,
+                                            hashtags: result.rows[index].hashtags,
+                                            description: result.rows[index].description,
+                                            location: locations.rows[0],
+                                            pictures: pictures.rows
+                                        }
+                                        response.push(user)
+                                    }
+                                    return res.status(200).json(response)
+                                }else {
+                                    return res.satus(200).json({})
+                                }
+                            })
+                        }
+                    })
+                }
+                else
+                    return res.status(401).send('Unauthorized');
+            })
+        })
     }
 }
