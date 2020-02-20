@@ -76,11 +76,11 @@ module.exports = {
                                                 var id = tab[el].id
 
                                                 tab[el] = ([
-                                                    score= score,
-                                                    id= id
+                                                    score = score,
+                                                    id = id
                                                 ])
                                             }
-                                            if (tab[0] != undefined){
+                                            if (tab[0] != undefined) {
                                                 await tab.sort()
                                                 await tab.reverse()
                                                 var list_id = ""
@@ -92,16 +92,52 @@ module.exports = {
                                                     else
                                                         list_id = list_id + " " + tab[el][1]
                                                 }
-                                                var select_user = "SELECT id, login, name, age, description, hashtags FROM accounts WHERE id IN (" + list_id + ");"
+                                                var select_user = "SELECT accounts.id, accounts.login, accounts.name, accounts.firstname, accounts.age, accounts.description, accounts.hashtags, locations.longitude, locations.latitude FROM accounts JOIN locations ON accounts.id = locations.id WHERE accounts.id IN (" + list_id + ");"
                                                 client.query(select_user, async (err, result) => {
                                                     if (err)
                                                         return res.status(500).send('Internal Server Error')
-                                                    console.log(result.rows)
-                                                    return res.status(200).json(result.rows)
+                                                    if (result.rows[0] === undefined)
+                                                        return res.status(200).json([])
+
+                                                    var response = []
+                                                    for (const index in result.rows){
+
+                                                        var query_picture = "SELECT url, profile_picture FROM pictures WHERE id_account = " + result.rows[index].id + ";"
+                                                        var query_location = "SELECT latitude, longitude FROM locations WHERE id = " + result.rows[index].id + ";"
+                                                        var response_query = await client.query(query_picture)
+                                                        var response_location = await client.query(query_location)
+
+                                                        var list_picture = []
+                                                        var profilePicture = "" 
+
+                                                        for (const i in response_query.rows) {
+                                                            if (response_query.rows[i].profile_picture == false)
+                                                                list_picture.push(response_query.rows[i].url)
+                                                            else
+                                                                profilePicture = response_query.rows[i].url
+                                                        }
+
+                                                        var user = {
+                                                            id: result.rows[index].id,
+                                                            login: result.rows[index].login,
+                                                            name: result.rows[index].name,
+                                                            firstname: result.rows[index].firstname,
+                                                            age: result.rows[index].age,
+                                                            hashtags: result.rows[index].hashtags,
+                                                            description: result.rows[index].description,
+                                                            location: response_location.rows[0],
+                                                            pictures: list_picture,
+                                                            profilePicture: profilePicture
+                                                        }
+                                                        response.push(user)
+                                                    }
+                                                    done()
+                                                    return res.status(200).json(response)
+                                                    
                                                 })
                                             }
                                             else {
-                                                return res.status(200).json({})  
+                                                return res.status(200).json({})
                                             }
                                         }
                                     })
@@ -120,14 +156,14 @@ module.exports = {
 }
 
 async function calc_score_match(hashtags, my_hashtags) {
-    if (hashtags != undefined && my_hashtags != undefined){
+    if (hashtags != undefined && my_hashtags != undefined) {
         var my_hashtags = my_hashtags.split(',')
         var hashtags = hashtags.split(',')
-    
+
         var count_my_hashtags = my_hashtags.length
-    
+
         var score = 0;
-        
+
         my_hashtags.forEach(my_el => {
             hashtags.forEach(el => {
                 if (my_el === el) {
