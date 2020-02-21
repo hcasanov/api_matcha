@@ -75,7 +75,6 @@ module.exports = {
                                         list_matchs = list_matchs + ", " + result.rows[index].to_id
                                 }
                             }
-                            // var select_matchs_query = "SELECT accounts.id, accounts.login, accounts.firstname, accounts.name, accounts.age, accounts.hashtags, accounts.description, locations.latitude, locations.longitude, pictures.url, pictures.profile_picture FROM accounts JOIN pictures ON accounts.id = pictures.id_account JOIN locations ON accounts.id = locations.id WHERE accounts.id IN (" + list_matchs + ");"
                             var select_matchs_query = "SELECT id, login, name, firstname, age, hashtags, description FROM accounts WHERE id IN (" + list_matchs + ");"
                             client.query(select_matchs_query, async (err, result) => {
                                 if (err)
@@ -83,7 +82,7 @@ module.exports = {
                                 if (result.rows[0] != undefined){
                                     var response = []
                                     for (const index in result.rows){
-                                        var query_pictures = "SELECT url, profile_picture FROM pictures WHERE id_account = " + result.rows[index].id + ";"
+                                        var query_pictures = "SELECT url_picture, profile_picture FROM pictures WHERE id_account = " + result.rows[index].id + ";"
                                         var query_location = "SELECT latitude, longitude FROM locations WHERE id = " + result.rows[index].id + ";"
 
                                         var pictures = await client.query(query_pictures)
@@ -93,9 +92,9 @@ module.exports = {
                                         var profilePicture = ""
                                         for (const i in pictures.rows){
                                             if (pictures.rows[i].profile_picture == false)
-                                                list_picture.push(pictures.rows[i].url)
+                                                list_picture.push(pictures.rows[i].url_picture)
                                             else
-                                                profilePicture = pictures.rows[i].url
+                                                profilePicture = pictures.rows[i].url_picture
                                         }
 
                                         var user = {

@@ -102,7 +102,7 @@ module.exports = {
                                                     var response = []
                                                     for (const index in result.rows){
 
-                                                        var query_picture = "SELECT url, profile_picture FROM pictures WHERE id_account = " + result.rows[index].id + ";"
+                                                        var query_picture = "SELECT url_picture, profile_picture FROM pictures WHERE id_account = " + result.rows[index].id + ";"
                                                         var query_location = "SELECT latitude, longitude FROM locations WHERE id = " + result.rows[index].id + ";"
                                                         var response_query = await client.query(query_picture)
                                                         var response_location = await client.query(query_location)
@@ -112,9 +112,9 @@ module.exports = {
 
                                                         for (const i in response_query.rows) {
                                                             if (response_query.rows[i].profile_picture == false)
-                                                                list_picture.push(response_query.rows[i].url)
+                                                                list_picture.push(response_query.rows[i].url_picture)
                                                             else
-                                                                profilePicture = response_query.rows[i].url
+                                                                profilePicture = response_query.rows[i].url_picture
                                                         }
 
                                                         var user = {
