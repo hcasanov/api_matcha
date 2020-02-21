@@ -1,4 +1,6 @@
 const database = require('./db');
+const JWT = require('../utils/jwt');
+const bcrypt = require('bcrypt');
 
 database.query("DROP TABLE IF EXISTS accounts;");
 database.query("DROP TABLE IF EXISTS pictures;");
@@ -7,14 +9,13 @@ database.query("DROP TABLE IF EXISTS notifications;");
 database.query("DROP TABLE IF EXISTS chats;");
 database.query("DROP TABLE IF EXISTS likes;");
 database.query("DROP TABLE IF EXISTS matchs;");
-setTimeout(init, 2000);
+console.log("1 - Tables droped")
 
+setTimeout(init, 2000);
 setTimeout(create_users, 2000);
 
-setTimeout(exit, 3000);
-
-function exit(){
-    console.log('Database initialized !');
+function ft_exit(){
+    console.log('4 - Database initialized !');
     process.exit();
 }
 
@@ -29,12 +30,12 @@ function init(){
 
 }
 
-function create_users (){
-    console.log('Creation users...')
+async function create_users (){
+    console.log('2 - Creation users...')
     var i = 500;
     var dateBirth = "12/12/12";
 
-    while (i) {
+    while (i != 0) {
         var age = Math.floor(Math.random() * (30 - 20 + 1)) + 18;
         var research_age_max = Math.floor(Math.random() * (30 - 25 + 1)) + 25;
         var research_age_min = Math.floor(Math.random() * (24 - 18 + 1)) + 18;
@@ -58,9 +59,15 @@ function create_users (){
         else
             var gender = 'M'
 
-        database.query("INSERT INTO accounts (login, name, firstname, mail, passwd, dateBirth, age, gender, description, hashtags, research_age_min, research_age_max, research_gender, date_created, date_update, confirm) VALUES (" + i + ", " + i + ", " + i + ", \'" + i + "@gmail.com\', \'" + i + "Test12\', " + dateBirth + ", " + age + ", \'" + gender + "\', 'Mauris pretium molestie enim, tincidunt volutpat ligula accumsan at. Donec ullamcorper hendrerit dapibus. Integer feugiat in nisi vel maximus. Aliquam erat volutpat. Suspendisse potenti. Ut ultrices maximus lobortis', 'cuise,sport,code,foot', " + research_age_min + ", " + research_age_max + ", \'" + research_gender + "\', " + dateBirth + ", " + dateBirth + ", true)");
+        var token = JWT.generateTokenLogin(i)
+        var password = await bcrypt.hash("Password", 10);
+
+        database.query("INSERT INTO accounts (id, login, name, firstname, mail, passwd, dateBirth, age, gender, description, hashtags, research_age_min, research_age_max, research_gender, date_created, date_update, confirm, token) VALUES (" + i + ", " + i + ", " + i + ", " + i + ", \'" + i + "@gmail.com\', \'" + password + "\', " + dateBirth + ", " + age + ", \'" + gender + "\', 'Mauris pretium molestie enim, tincidunt volutpat ligula accumsan at. Donec ullamcorper hendrerit dapibus. Integer feugiat in nisi vel maximus. Aliquam erat volutpat. Suspendisse potenti. Ut ultrices maximus lobortis', 'cuise,sport,code,foot', " + research_age_min + ", " + research_age_max + ", \'" + research_gender + "\', " + dateBirth + ", " + dateBirth + ", true, \'" + token + "\')");
         i--;
+        if (i % 5 === 0)
+            console.log(((i - 500) * -1) / 5 + " %")
     }
-    if (i == 0)
-        return console.log('Users created')
+    if (i === 0){}
+        console.log('3 - Users created')
+    ft_exit()
 }
