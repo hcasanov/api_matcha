@@ -8,6 +8,8 @@ require('dotenv').config();
 // Set extensions
 let app = express();
 
+
+
 // Start server
 app.use(cors());
 app.use(body.urlencoded({extended: true}))
@@ -23,3 +25,16 @@ app.use(function (req, res, next) {
 });
 
 app.listen(process.env.LISTEN_PORT)
+
+
+// io socket
+const server = require('http').Server(app)
+const io = require('socket.io')(server);
+
+io.on('connection', (socket) => {
+    console.log('User connected')
+
+    socket.on('disconnect'), () => {
+        console.log('User disconnected')
+    }
+})

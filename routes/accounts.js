@@ -5,6 +5,7 @@ const send_mail = require('../utils/sendMail');
 const Checker = require('../utils/checker');
 const pg = require('pg');
 const crypto = require('crypto');
+const nodemailer = require('nodemailer')
 
 const config = {
     user: process.env.SQL_USER,
@@ -24,10 +25,10 @@ module.exports = {
         }
         if (!Checker.isAdult(req.body.dateBirth))
             return res.status(403).send("Too young to subscribe");
-        
+
         if (!Checker.checkPasswd(req.body.passwd, req.body.repeatPasswd))
             return res.status(403).send("Incorrect password");
-            
+
         Checker.accountExist(req.body.mail, async function (result) {
             if (result)
                 return res.status(400).send('Account already exist')
@@ -39,13 +40,13 @@ module.exports = {
                 var date_update = Date();
                 var new_account = await client.query("INSERT INTO accounts (login, name, firstname, mail, passwd, datebirth, gender, date_created, date_update, confirm) VALUES (\'" + req.body.login + "\', \'" + req.body.name + "\', \'" + req.body.firstname + "\', \'" + req.body.mail + "\', \'" + passwd + "\', \'" + req.body.dateBirth + "\', \'" + req.body.gender + "\', \'" + date_created + "\', \'" + date_update + "\', false); ");
                 var new_location = await client.query("INSERT INTO locations (latitude, longitude, date_created, date_update) VALUES (\'" + req.body.latitude + "\', \'" + req.body.longitude + "\', \'" + date_created + "\', \'" + date_update + "\'); ");
-                if (new_account == 'error' || new_location == 'error'){
+                if (new_account == 'error' || new_location == 'error') {
                     done();
                     return res.status(500).send('Internal Server Error');
                 }
                 else {
                     await client.query("SELECT id FROM accounts WHERE mail = \'" + req.body.mail + "\';", async function (err, result) {
-                        if (err){
+                        if (err) {
                             done();
                             return res.status(500).send('Internal Server Error')
                         }
@@ -57,19 +58,24 @@ module.exports = {
                             var token_confirm = buf.toString('hex')
                             client.query("UPDATE accounts SET token_confirm = \'" + token_confirm + "\' WHERE id = \'" + new_id + "\'", (err, result) => {
                                 done()
-                                if (err){
+                                if (err) {
                                     res.status(500).send('Internal Server Error')
                                 }
-                                return res.status(200).send('OK')
-                                // send_mail(token_confirm, req)
+                                // return res.status(200).send('OK')
+                                send_mail(token_confirm, req, (response) => {
+                                    if (response === "OK")
+                                        return res.status(200).send('OK')
+                                    else
+                                        return res.status(500).send('Internal Server Error')
+                                })
                             })
-                          });
+                        });
                     })
                 }
             })
         });
     },
-    confirm_register: function(req, res) {
+    confirm_register: function (req, res) {
 
         pool.connect(async function (err, client, done) {
             var date_update = Date();
@@ -535,8 +541,8 @@ module.exports = {
                             return res.status(500).send('Internal Server Error');
                         else if (result == undefined)
                             return res.status(401).send('Unauthorized');
-                        else{
-                            if (result.rows[0].hashtags != undefined){
+                        else {
+                            if (result.rows[0].hashtags != undefined) {
                                 var tab_hashtags = result.rows[0].hashtags.split(',');
                                 result.rows[0].hashtags = tab_hashtags;
                             }
@@ -575,6 +581,49 @@ module.exports = {
                 else
                     return res.status(401).send('Unauthorized');
             })
+        })
+    },
+    forgotPasswd: async function (req, res) { // Get mail in body
+        Checker.accountExist(req.body.mail, (result) => {
+            if (result){
+                pool.connect(function (err, client, done) {
+                    crypto.randomBytes(6, async (err, buf) => {
+                        if (err) throw err;
+                        var new_passwd = buf.toString('hex')
+                        var hash = await bcrypt.hash(new_passwd, 10);
+                        client.query("UPDATE accounts SET passwd = \'" + hash + "\' WHERE mail = \'" + req.body.mail + "\'", (err, result) => {
+                            done()
+                            if (err) {
+                                return res.status(500).send('Internal Server Error')
+                            }
+                            var transporter = nodemailer.createTransport({
+                                service: 'gmail',
+                                auth: {
+                                       user: 'noelledeur@gmail.com',
+                                       pass: 'Lemotdepasseestmotdepasse'
+                                   }
+                               });
+                            
+                               const mailOptions = {
+                                from: 'noelledeur@gmail.com', // sender address
+                                to: req.body.mail, // list of receivers
+                                subject: 'Forgot password matcha', // Subject line
+                                html: "Votre nouveau mot de passe est " + new_passwd +  " ",// plaintext body
+                              };
+                            
+                              transporter.sendMail(mailOptions, function (err, info) {
+                                if(err)
+                                  console.log(err)
+                                else
+                                  return res.status(200).send('OK')
+                             });
+                        })
+                    });
+                })
+            }
+            else {
+                return res.status(400).send('Account doesn\'t exist !')
+            }
         })
     }
 }

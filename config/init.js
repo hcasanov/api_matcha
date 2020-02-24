@@ -62,7 +62,7 @@ async function create_users (){
         var token = JWT.generateTokenLogin(i)
         var password = await bcrypt.hash("Password", 10);
 
-        database.query("INSERT INTO accounts (id, login, name, firstname, mail, passwd, dateBirth, age, gender, description, hashtags, research_age_min, research_age_max, research_gender, date_created, date_update, confirm, token) VALUES (" + i + ", " + i + ", " + i + ", " + i + ", \'" + i + "@gmail.com\', \'" + password + "\', " + dateBirth + ", " + age + ", \'" + gender + "\', 'Mauris pretium molestie enim, tincidunt volutpat ligula accumsan at. Donec ullamcorper hendrerit dapibus. Integer feugiat in nisi vel maximus. Aliquam erat volutpat. Suspendisse potenti. Ut ultrices maximus lobortis', 'cuise,sport,code,foot', " + research_age_min + ", " + research_age_max + ", \'" + research_gender + "\', " + dateBirth + ", " + dateBirth + ", true, \'" + token + "\')");
+        database.query("INSERT INTO accounts (login, name, firstname, mail, passwd, dateBirth, age, gender, description, hashtags, research_age_min, research_age_max, research_gender, date_created, date_update, confirm, token) VALUES (" + i + ", " + i + ", " + i + ", \'" + i + "@gmail.com\', \'" + password + "\', " + dateBirth + ", " + age + ", \'" + gender + "\', 'Mauris pretium molestie enim, tincidunt volutpat ligula accumsan at. Donec ullamcorper hendrerit dapibus. Integer feugiat in nisi vel maximus. Aliquam erat volutpat. Suspendisse potenti. Ut ultrices maximus lobortis', 'cuise,sport,code,foot', " + research_age_min + ", " + research_age_max + ", \'" + research_gender + "\', " + dateBirth + ", " + dateBirth + ", true, \'" + token + "\')");
         i--;
         if (i % 5 === 0)
             console.log(((i - 500) * -1) / 5 + " %")
