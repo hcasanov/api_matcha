@@ -79,7 +79,7 @@ module.exports = {
 
         pool.connect(async function (err, client, done) {
             var date_update = Date();
-            var update = await client.query("UPDATE accounts SET confirm = true, date_update = \'" + date_update + "\' WHERE token = \'" + req.params.token + "\'");
+            var update = await client.query("UPDATE accounts SET confirm = true, date_update = \'" + date_update + "\' WHERE token_confirm = \'" + req.params.token_confirm + "\'");
             if (update == 'error') {
                 done();
                 return res.status(500).send('Internal Server Error');
@@ -625,5 +625,25 @@ module.exports = {
                 return res.status(400).send('Account doesn\'t exist !')
             }
         })
-    }
+    },
+    // block: function (req, res) {
+    //     if (req.headers.token == undefined || req.body.id == undefined)
+    //         return res.status(400).send('Bad Request');
+    //     pool.connect(function (err, client, done) {
+    //         var id = jwt_decode(req.headers.token).id;
+    //         var query = "SELECT token FROM accounts WHERE id = \'" + id + "\';";
+    //         client.query(query, (err, result) => {
+    //             console.log(id)
+    //             if (err)
+    //                 return res.status(500).send('Internal Server Error');
+    //             else if (result.rows[0] == undefined)
+    //                 return res.status(401).send('Unauthorized');
+    //             else if (result.rows[0].token === req.headers.token) {
+                    
+    //             }
+    //             else
+    //                 return res.status(401).send('Unauthorized');
+    //         })
+    //     })
+    // }
 }
