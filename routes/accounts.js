@@ -585,7 +585,7 @@ module.exports = {
     },
     forgotPasswd: async function (req, res) { // Get mail in body
         Checker.accountExist(req.body.mail, (result) => {
-            if (result){
+            if (result) {
                 pool.connect(function (err, client, done) {
                     crypto.randomBytes(6, async (err, buf) => {
                         if (err) throw err;
@@ -599,24 +599,24 @@ module.exports = {
                             var transporter = nodemailer.createTransport({
                                 service: 'gmail',
                                 auth: {
-                                       user: 'noelledeur@gmail.com',
-                                       pass: 'Lemotdepasseestmotdepasse'
-                                   }
-                               });
-                            
-                               const mailOptions = {
+                                    user: 'noelledeur@gmail.com',
+                                    pass: 'Lemotdepasseestmotdepasse'
+                                }
+                            });
+
+                            const mailOptions = {
                                 from: 'noelledeur@gmail.com', // sender address
                                 to: req.body.mail, // list of receivers
                                 subject: 'Forgot password matcha', // Subject line
-                                html: "Votre nouveau mot de passe est " + new_passwd +  " ",// plaintext body
-                              };
-                            
-                              transporter.sendMail(mailOptions, function (err, info) {
-                                if(err)
-                                  console.log(err)
+                                html: "Votre nouveau mot de passe est " + new_passwd + " ",// plaintext body
+                            };
+
+                            transporter.sendMail(mailOptions, function (err, info) {
+                                if (err)
+                                    console.log(err)
                                 else
-                                  return res.status(200).send('OK')
-                             });
+                                    return res.status(200).send('OK')
+                            });
                         })
                     });
                 })
@@ -626,24 +626,56 @@ module.exports = {
             }
         })
     },
-    // block: function (req, res) {
-    //     if (req.headers.token == undefined || req.body.id == undefined)
-    //         return res.status(400).send('Bad Request');
-    //     pool.connect(function (err, client, done) {
-    //         var id = jwt_decode(req.headers.token).id;
-    //         var query = "SELECT token FROM accounts WHERE id = \'" + id + "\';";
-    //         client.query(query, (err, result) => {
-    //             console.log(id)
-    //             if (err)
-    //                 return res.status(500).send('Internal Server Error');
-    //             else if (result.rows[0] == undefined)
-    //                 return res.status(401).send('Unauthorized');
-    //             else if (result.rows[0].token === req.headers.token) {
-                    
-    //             }
-    //             else
-    //                 return res.status(401).send('Unauthorized');
-    //         })
-    //     })
-    // }
+    report: function (req, res) {
+        if (req.headers.token == undefined || req.body.to_id == undefined || req.body.message == undefined)
+            return res.status(400).send('Bad Request');
+        pool.connect(function (err, client, done) {
+            var id = jwt_decode(req.headers.token).id;
+            var query = "SELECT token FROM accounts WHERE id = \'" + id + "\';";
+            client.query(query, (err, result) => {
+                console.log(id)
+                if (err)
+                    return res.status(500).send('Internal Server Error');
+                else if (result.rows[0] == undefined)
+                    return res.status(401).send('Unauthorized');
+                else if (result.rows[0].token === req.headers.token) {
+                    var date_created = Date();
+                    var from_id = id;
+                    var to_id = req.body.to_id;
+                    var message = req.body.message;
+                    var query_insert = "INSERT INTO reports (from_id, to_id, message, created_date) VALUES (" + from_id + ", " + to_id + ", " + message + ", " + date_created + ")"
+                    client.query(query_insert, (err, result) => {
+                        if (err)
+                            return res.status(500).send('Internal Server Error')
+                        var transporter = nodemailer.createTransport({
+                            service: 'gmail',
+                            auth: {
+                                user: 'noelledeur@gmail.com',
+                                pass: 'Lemotdepasseestmotdepasse'
+                            }
+                        });
+
+                        const mailOptions = {
+                            from: 'noelledeur@gmail.com', // sender address
+                            to: "hcasanov@student.42.fr", // list of receivers
+                            subject: 'Forgot password matcha', // Subject line
+                            html: "Le user avec l'id " + req.body.to_id + " a été report pour la raison : \'" + req.body.message + "\' !",// plaintext body
+                        };
+
+                        transporter.sendMail(mailOptions, function (err, info) {
+                            if (err)
+                                console.log(err)
+                            else
+                                return res.status(200).send('OK')
+                        });
+                        $.ajax({
+                            url: "http://localhost:8080/notifications"
+                        })
+                    })
+                }
+                else
+                    return res.status(401).send('Unauthorized');
+            })
+        })
+    }
 }
