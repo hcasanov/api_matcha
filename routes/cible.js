@@ -92,7 +92,7 @@ module.exports = {
                                                     else
                                                         list_id = list_id + " " + tab[el][1]
                                                 }
-                                                var select_user = "SELECT accounts.id, accounts.login, accounts.last_connection, accounts.name, accounts.firstname, accounts.age, accounts.description, accounts.hashtags, locations.longitude, locations.latitude FROM accounts JOIN locations ON accounts.id = locations.id WHERE accounts.id IN (" + list_id + ");"
+                                                var select_user = "SELECT id, login, last_connection, online, name, firstname, age, description, hashtags FROM accounts WHERE id IN (" + list_id + ");"
                                                 console.log(select_user)
                                                 client.query(select_user, async (err, result) => {
                                                     if (err)
