@@ -123,5 +123,32 @@ module.exports = {
                     return res.status(401).send('Unauthorized');
             })
         })
+    },
+    unmatch: function (req, res) {
+        if (req.headers.token == undefined || req.body.to_id == undefined)
+            return res.status(400).send('Bad Request');
+        pool.connect(function (err, client, done) {
+            var id = jwt_decode(req.headers.token).id;
+            var query = "SELECT token FROM accounts WHERE id = \'" + id + "\';";
+            client.query(query, (err, result) => {
+                console.log(id)
+                if (err)
+                    return res.status(500).send('Internal Server Error');
+                else if (result.rows[0] == undefined)
+                    return res.status(401).send('Unauthorized');
+                else if (result.rows[0].token === req.headers.token) {
+                    var to_id = req.body.to_id
+                    var from_id = id
+                    var query = "DELETE FROM matchs WHERE (from_id = " + to_id + " AND to_id = " + from_id + ") OR (from_id = " + from_id + " AND to_id = " + to_id + ")"
+                    client.query(query, (err, result) => {
+                        if (err)
+                            return res.status(500).send('Internal Server Error')
+                        return res.status(200).send('OK')
+                    })
+                }
+                else
+                    return res.status(401).send('Unauthorized');
+            })
+        })
     }
 }

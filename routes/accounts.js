@@ -668,9 +668,6 @@ module.exports = {
                             else
                                 return res.status(200).send('OK')
                         });
-                        $.ajax({
-                            url: "http://localhost:8080/notifications"
-                        })
                     })
                 }
                 else
