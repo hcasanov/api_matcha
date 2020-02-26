@@ -128,7 +128,8 @@ module.exports = {
                                                             location: response_location.rows[0],
                                                             pictures: list_picture,
                                                             profilePicture: profilePicture,
-                                                            lastConnection: result.rows[index].last_connection
+                                                            lastConnection: result.rows[index].last_connection,
+                                                            online: result.rows[index].online
                                                         }
                                                         response.push(user)
                                                     }
