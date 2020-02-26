@@ -79,7 +79,7 @@ module.exports = {
 
         pool.connect(async function (err, client, done) {
             var date_update = Date();
-            var update = await client.query("UPDATE accounts SET confirm = true, date_update = \'" + date_update + "\' WHERE token_confirm = \'" + req.params.token_confirm + "\'");
+            var update = await client.query("UPDATE accounts SET confirm = true, date_update = \'" + date_update + "\' WHERE token_confirm = \'" + req.params.token + "\'");
             if (update == 'error') {
                 done();
                 return res.status(500).send('Internal Server Error');
@@ -643,7 +643,7 @@ module.exports = {
                     var from_id = id;
                     var to_id = req.body.to_id;
                     var message = req.body.message;
-                    var query_insert = "INSERT INTO reports (from_id, to_id, message, created_date) VALUES (" + from_id + ", " + to_id + ", " + message + ", " + date_created + ")"
+                    var query_insert = "INSERT INTO reports (from_id, to_id, message, created_date) VALUES (" + from_id + ", " + to_id + ", \'" + message + "\', \'" + date_created + ")\'"
                     client.query(query_insert, (err, result) => {
                         if (err)
                             return res.status(500).send('Internal Server Error')
