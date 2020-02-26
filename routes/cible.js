@@ -123,7 +123,7 @@ module.exports = {
                                                             name: result.rows[index].name,
                                                             firstname: result.rows[index].firstname,
                                                             age: result.rows[index].age,
-                                                            hashtags: result.rows[index].hashtags,
+                                                            hashtags: result.rows[index].hashtags.split(','),
                                                             description: result.rows[index].description,
                                                             location: response_location.rows[0],
                                                             pictures: list_picture,
