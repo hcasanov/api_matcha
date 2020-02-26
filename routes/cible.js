@@ -116,7 +116,11 @@ module.exports = {
                                                             else
                                                                 profilePicture = response_query.rows[i].url_picture
                                                         }
-
+                                                        let i = 0;
+                                                        while(tab[i][1] != result.rows[index].id){
+                                                            i++
+                                                        }
+                                                        var score_user = tab[i][0]
                                                         var user = {
                                                             id: result.rows[index].id,
                                                             login: result.rows[index].login,
@@ -129,7 +133,8 @@ module.exports = {
                                                             pictures: list_picture,
                                                             profilePicture: profilePicture,
                                                             lastConnection: result.rows[index].last_connection,
-                                                            online: result.rows[index].online
+                                                            online: result.rows[index].online,
+                                                            score: score_user
                                                         }
                                                         response.push(user)
                                                     }
