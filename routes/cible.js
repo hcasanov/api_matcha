@@ -120,13 +120,23 @@ module.exports = {
                                                             i++
                                                         }
                                                         var score_user = tab[i][0]
+
+                                                        if (result.rows[index].hashtags != null){
+                                                            var hashtags = result.rows[index].hashtags.split(',')
+                                                            for(const index in hashtags){
+                                                                hashtags[index] = "#" + hashtags[index]
+                                                            }
+                                                        } else {
+                                                            hashtags = []
+                                                        }
+
                                                         var user = {
                                                             id: result.rows[index].id,
                                                             login: result.rows[index].login,
                                                             name: result.rows[index].name,
                                                             firstname: result.rows[index].firstname,
                                                             age: result.rows[index].age,
-                                                            hashtags: result.rows[index].hashtags.split(','),
+                                                            hashtags: hashtags,
                                                             description: result.rows[index].description,
                                                             location: response_location.rows[0],
                                                             pictures: list_picture,
