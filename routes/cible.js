@@ -93,7 +93,6 @@ module.exports = {
                                                         list_id = list_id + " " + tab[el][1]
                                                 }
                                                 var select_user = "SELECT id, login, last_connection, online, name, firstname, age, description, hashtags FROM accounts WHERE id IN (" + list_id + ");"
-                                                console.log(select_user)
                                                 client.query(select_user, async (err, result) => {
                                                     if (err)
                                                         return res.status(500).send('Internal Server Error')
@@ -163,7 +162,7 @@ module.exports = {
 }
 
 async function calc_score_match(hashtags, my_hashtags) {
-    if (hashtags != undefined && my_hashtags != undefined) {
+    if ((hashtags != undefined && my_hashtags != undefined) && (hashtags != null && my_hashtags != null)) {
         var my_hashtags = my_hashtags.split(',')
         var hashtags = hashtags.split(',')
 
