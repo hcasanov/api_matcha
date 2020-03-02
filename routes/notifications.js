@@ -18,11 +18,15 @@ module.exports = {
         var name = "New like";
 
         pool.connect(function (err, client, done) {
-            if (err)
-                return console.log(err)
+            if (err){
+                console.log(err)
+                return res.status(500).send('Internal Server Error')
+            }
             client.query("SELECT firstname FROM accounts WHERE id = \'" + from_id + "\';", (err, result) => {
-                if (err)
-                    return console.log(err)
+                if (err){
+                    console.log(err)
+                    return res.status(500).send('Internal Server Error')
+                }
                 var firstname_from = result.rows[0].firstname;
                 var message = "You got a new like, " + firstname_from + " like you";
                 var status = true;
@@ -35,7 +39,7 @@ module.exports = {
                         return res.status(500)
                     }
                     else
-                        res.status(200).send('OK');
+                        return res.status(200).send('OK');
                 })
             })
         })

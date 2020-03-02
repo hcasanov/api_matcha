@@ -471,7 +471,6 @@ module.exports = {
             var id = jwt_decode(req.headers.token).id;
             var query = "SELECT token FROM accounts WHERE id = \'" + id + "\';";
             client.query(query, (err, result) => {
-                console.log(id)
                 if (err)
                     return res.status(500).send('Internal Server Error');
                 else if (result.rows[0] == undefined)
@@ -568,7 +567,6 @@ module.exports = {
                 else if (result.rows[0].token === req.headers.token) {
                     var lastConnection = new Date()
                     var query = "UPDATE accounts SET online = false, last_connection = \'" + lastConnection + "\' WHERE id = " + id + ";"
-                    console.log(query)
                     client.query(query, (err, result) => {
                         if (err)
                             return res.status(500).send('Internal Server Error')
@@ -632,7 +630,6 @@ module.exports = {
             var id = jwt_decode(req.headers.token).id;
             var query = "SELECT token FROM accounts WHERE id = \'" + id + "\';";
             client.query(query, (err, result) => {
-                console.log(id)
                 if (err)
                     return res.status(500).send('Internal Server Error');
                 else if (result.rows[0] == undefined)
@@ -643,7 +640,6 @@ module.exports = {
                     var to_id = req.body.to_id;
                     var message = req.body.message;
                     var query_insert = "INSERT INTO reports (from_id, to_id, message, date_created) VALUES (" + from_id + ", " + to_id + ", \'" + message + "\', \'" + date_created + "\')"
-                    console.log(query_insert)
                     client.query(query_insert, (err, result) => {
                         if (err)
                             return res.status(500).send('Internal Server Error')

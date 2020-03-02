@@ -39,7 +39,6 @@ module.exports = {
                             }
                             if (result.rows[0] === undefined){
                                 done();
-                                console.log(result);
                                 return res.status(200).send('OK');
                             }
                             else
