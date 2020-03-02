@@ -17,7 +17,6 @@ const pool = new pg.Pool(config);
 
 module.exports = {
     register: async function (req, res) {
-        console.log(req.body)
         // Parsing
         let { error } = Checker.ValidationError(req.body);
         if (error) {
@@ -643,7 +642,8 @@ module.exports = {
                     var from_id = id;
                     var to_id = req.body.to_id;
                     var message = req.body.message;
-                    var query_insert = "INSERT INTO reports (from_id, to_id, message, created_date) VALUES (" + from_id + ", " + to_id + ", \'" + message + "\', \'" + date_created + ")\'"
+                    var query_insert = "INSERT INTO reports (from_id, to_id, message, date_created) VALUES (" + from_id + ", " + to_id + ", \'" + message + "\', \'" + date_created + "\')"
+                    console.log(query_insert)
                     client.query(query_insert, (err, result) => {
                         if (err)
                             return res.status(500).send('Internal Server Error')
