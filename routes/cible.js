@@ -124,7 +124,6 @@ module.exports = {
                                                         if (result.rows[index].hashtags != null){
                                                             var hashtags = result.rows[index].hashtags.split(',')
                                                             for(const index in hashtags){
-                                                                hashtags[index] = "#" + hashtags[index]
                                                                 hashtags[index] = hashtags[index].trim()
                                                             }
                                                         } else {
