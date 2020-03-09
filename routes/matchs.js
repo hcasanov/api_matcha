@@ -96,14 +96,22 @@ module.exports = {
                                             else
                                                 profilePicture = pictures.rows[i].url_picture
                                         }
-
+                                        
+                                        if (result.rows[index].hashtags != null){
+                                            var hashtags = result.rows[index].hashtags.split(',')
+                                            for(const index in hashtags){
+                                                hashtags[index] = hashtags[index].trim()
+                                            }
+                                        } else {
+                                            hashtags = []
+                                        }
                                         var user = {
                                             id: result.rows[index].id,
                                             login: result.rows[index].login,
                                             name: result.rows[index].name,
                                             firstname: result.rows[index].firstname,
                                             age: result.rows[index].age,
-                                            hashtags: result.rows[index].hashtags,
+                                            hashtags: hashtags,
                                             description: result.rows[index].description,
                                             location: locations.rows[0],
                                             pictures: list_picture,

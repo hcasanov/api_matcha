@@ -533,18 +533,42 @@ module.exports = {
                     return res.status(401).send('Unauthorized');
                 else if (result.rows[0].token === req.headers.token) {
                     var query = "SELECT id, login, name, firstname, mail, datebirth, gender, description, age, hashtags, research_perimeter, research_age_min, research_age_max, research_gender, research_hashtags FROM accounts WHERE id = " + id + " ;";
-                    client.query(query, (err, result) => {
-                        done();
-                        if (err)
+                    client.query(query, async (err, result) => {
+                        if (err){
+                            done()
                             return res.status(500).send('Internal Server Error');
-                        else if (result == undefined)
+                        }
+                        else if (result == undefined){
+                            done()
                             return res.status(401).send('Unauthorized');
+                        }
                         else {
                             if (result.rows[0].hashtags != undefined) {
                                 var tab_hashtags = result.rows[0].hashtags.split(',');
                                 result.rows[0].hashtags = tab_hashtags;
                             }
-                            return res.status(200).json(result.rows);
+                            var query_loc = "SELECT latitude, longitude FROM locations WHERE id = " + id + ""
+                            var response = await client.query(query_loc);
+                            var user = {
+                                id: result.rows[0].id,
+                                login: result.rows[0].login,
+                                name: result.rows[0].name,
+                                mail: result.rows[0].mail,
+                                firstname: result.rows[0].firstname,
+                                age: result.rows[0].age,
+                                hashtags: result.rows[0].hashtags,
+                                description: result.rows[0].description,
+                                dateBirth: result.rows[0].dateBirth,
+                                gender: result.rows[0].gender,
+                                research_age_min: result.rows[0].research_age_min,
+                                research_age_max: result.rows[0].research_age_max,
+                                research_gender: result.rows[0].research_gender,
+                                research_perimeter: result.rows[0].research_perimeter,
+                                location: response.rows[0],
+                                lastConnection: result.rows[0].last_connection,
+                                online: result.rows[0].online,
+                            }
+                            return res.status(200).json(user);
                         }
                     })
                 }

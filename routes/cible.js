@@ -129,7 +129,6 @@ module.exports = {
                                                         } else {
                                                             hashtags = []
                                                         }
-
                                                         var user = {
                                                             id: result.rows[index].id,
                                                             login: result.rows[index].login,
