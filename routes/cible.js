@@ -27,18 +27,6 @@ module.exports = {
                     return res.status(401).send('Unauthorized');
                 }
                 else if (result.rows[0].token === req.headers.token) {
-                    var id = jwt_decode(req.headers.token).id;
-                    var query = "SELECT token FROM accounts WHERE id = \'" + id + "\';";
-                    client.query(query, (err, result) => {
-                        if (err) {
-                            done()
-                            return res.status(500).send('Internal Server Error');
-                        }
-                        else if (result == undefined) {
-                            done()
-                            return res.status(401).send('Unauthorized');
-                        }
-                        else if (result.rows[0].token === req.headers.token) {
                             var query = "Select * FROM accounts WHERE id = " + id + ";"
                             client.query(query, (err, result) => {
                                 if (err) {
@@ -98,20 +86,37 @@ module.exports = {
                                                         return res.status(500).send('Internal Server Error')
                                                     if (result.rows[0] === undefined)
                                                         return res.status(200).json([])
+                                                    var tab_parse = []
                                                     if (result.rows[0] != undefined){
-                                                        for (const i in result.rows){
-                                                            var query_block = "SELECT id FROM block WHERE from_id = " + id + " AND to_id = " + result.rows[i].id + ""
+
+                                                        result.rows.forEach(el => {
+                                                            var query_block = "SELECT id FROM block WHERE from_id = " + jwt_decode(req.headers.token).id + " AND to_id = " + el.id + ""
                                                             client.query(query_block, (err, response_block) => {
                                                                 if (err){
                                                                     done()
                                                                     return res.status(500).send('Internal Server Error')
                                                                 }
-                                                                if (response_block.rows[0] != undefined){
-                                                                    result.rows.splice(i, 1)
+                                                                else if (response_block.rows == []){
+                                                                    tab_parse.push(el)
                                                                 }
                                                             })
-                                                        }
+                                                        })
+                                                        // for (const i in result.rows){
+                                                        //     var query_block = "SELECT id FROM block WHERE from_id = " + jwt_decode(req.headers.token).id + " AND to_id = " + result.rows[i].id + ""
+                                                        //     client.query(query_block, (err, response_block) => {
+                                                        //         if (err){
+                                                        //             done()
+                                                        //             return res.status(500).send('Internal Server Error')
+                                                        //         }
+                                                        //         else if (response_block.rows[0] != undefined){
+                                                        //             result.rows.splice(i, 1)
+                                                        //         }
+                                                        //     })
+                                                        // }
                                                     }
+
+
+                                                    console.log(tab_parse)
                                                     var response = []
                                                     for (const index in result.rows){
 
@@ -121,7 +126,7 @@ module.exports = {
                                                         var response_location = await client.query(query_location)
 
                                                         var list_picture = []
-                                                        var profilePicture = "" 
+                                                        var profilePicture = ""
 
                                                         for (const i in response_query.rows) {
                                                             if (response_query.rows[i].profile_picture == false)
@@ -143,6 +148,10 @@ module.exports = {
                                                         } else {
                                                             hashtags = []
                                                         }
+                                                        if (response_location.rows[0] != undefined)
+                                                            localisation = response_location.rows[0]
+                                                        else
+                                                            localisation = null
                                                         var user = {
                                                             id: result.rows[index].id,
                                                             login: result.rows[index].login,
@@ -151,7 +160,7 @@ module.exports = {
                                                             age: result.rows[index].age,
                                                             hashtags: hashtags,
                                                             description: result.rows[index].description,
-                                                            location: response_location.rows[0],
+                                                            location: localisation,
                                                             pictures: list_picture,
                                                             profilePicture: profilePicture,
                                                             lastConnection: result.rows[index].last_connection,
@@ -172,10 +181,10 @@ module.exports = {
                                     })
                                 }
                             })
-                        }
-                        else
-                            return res.status(401).send('Unauthorized');
-                    })
+                        // }
+                        // else
+                        //     return res.status(401).send('Unauthorized');
+                    // })
                 }
                 else
                     return res.status(401).send('Unauthorized');

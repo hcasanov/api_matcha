@@ -60,7 +60,6 @@ module.exports = {
                                 if (err) {
                                     res.status(500).send('Internal Server Error')
                                 }
-                                // return res.status(200).send('OK')
                                 send_mail(token_confirm, req, (response) => {
                                     if (response === "OK")
                                         return res.status(200).send('OK')
@@ -109,7 +108,7 @@ module.exports = {
                     bcrypt.compare(req.body.passwd, found.passwd, function (err, result) {
                         if (result) {
                             var token = JWT.generateTokenLogin(found.id);
-                            client.query("UPDATE accounts SET token = \'" + token + "\', online = true;", function (err) {
+                            client.query("UPDATE accounts SET token = \'" + token + "\', online = true WHERE id = " + found.id + ";", function (err) {
                                 done();
                                 return res.status(202).json({
                                     '_id': found.id,
