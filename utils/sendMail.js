@@ -14,7 +14,7 @@ var nodemailer = require('nodemailer');
     from: 'noelledeur@gmail.com', // sender address
     to: req.body.mail, // list of receivers
     subject: 'Confirme incscription Matcha', // Subject line
-    html: "Veuiller cliquer sur le lien pour confirmer votre compte : <a href='http://localhost:3000/" + token_confirm + "'>cliquer_ici</a>",// plaintext body
+    html: "Veuiller cliquer sur le lien pour confirmer votre compte : <a href='http://localhost:3000/accounts/confirm/" + token_confirm + "'>cliquer_ici</a>",// plaintext body
   };
 
   transporter.sendMail(mailOptions, function (err, info) {
