@@ -694,5 +694,43 @@ module.exports = {
                     return res.status(401).send('Unauthorized');
             })
         })
+    },
+    block: function(req, res) {
+        if (req.headers.token == undefined || req.body.to_id == undefined)
+            return res.status(400).send('Bad Request');
+        pool.connect(function (err, client, done) {
+            var id = jwt_decode(req.headers.token).id;
+            var query = "SELECT token FROM accounts WHERE id = \'" + id + "\';";
+            client.query(query, (err, result) => {
+                if (err){
+                    done()
+                    return res.status(500).send('Internal Server Error');
+                }
+                else if (result.rows[0] == undefined){
+                    done()
+                    return res.status(401).send('Unauthorized');
+                }
+                else if (result.rows[0].token === req.headers.token) {
+                    var query = "INSERT INTO block (from_id, to_id) VALUES (" + id + ", " + req.body.to_id + ")"
+                    client.query(query, async (err, result) => {
+                        if (err){
+                            done()
+                            console.log(err)
+                            return res.status(500).send('Internal Server Error')
+                        }
+                        var query_delete_match = "DELETE FROM matchs WHERE (from_id = " + id + " AND to_id = " + req.body.to_id + ") OR (from_id = " + req.body.to_id + " AND to_id = " + id + ")"
+                        client.query(query_delete_match, async (err, result) => {
+                            if (err){
+                                done()
+                                return res.status(500).send("Internal Server Error")
+                            }
+                            return res.status(201).send("Created")
+                        })
+                    })
+                }
+                else
+                    return res.status(401).send('Unauthorized');
+            })
+        })
     }
 }

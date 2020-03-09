@@ -39,6 +39,7 @@ function init() {
     database.query("CREATE TABLE IF NOT EXISTS matchs (id SERIAL PRIMARY KEY NOT NULL, from_id INT, to_id INT, date_created VARCHAR(100), status BOOLEAN)\;");
     database.query("CREATE TABLE IF NOT EXISTS chats (id SERIAL PRIMARY KEY NOT NULL, from_id INT, to_id INT, message TEXT, date_created VARCHAR(100))\;");
     database.query("CREATE TABLE IF NOT EXISTS reports (id SERIAL PRIMARY KEY NOT NULL, from_id INT, to_id INT, message TEXT, date_created VARCHAR(100))\;");
+    database.query("CREATE TABLE IF NOT EXISTS block (id SERIAL PRIMARY KEY NOT NULL, from_id INT, to_id INT, date_created VARCHAR(100))\;");
 }
 
 async function create_users() {

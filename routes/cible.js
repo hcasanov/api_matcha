@@ -98,6 +98,20 @@ module.exports = {
                                                         return res.status(500).send('Internal Server Error')
                                                     if (result.rows[0] === undefined)
                                                         return res.status(200).json([])
+                                                    if (result.rows[0] != undefined){
+                                                        for (const i in result.rows){
+                                                            var query_block = "SELECT id FROM block WHERE from_id = " + id + " AND to_id = " + result.rows[i].id + ""
+                                                            client.query(query_block, (err, response_block) => {
+                                                                if (err){
+                                                                    done()
+                                                                    return res.status(500).send('Internal Server Error')
+                                                                }
+                                                                if (response_block.rows[0] != undefined){
+                                                                    result.rows.splice(i, 1)
+                                                                }
+                                                            })
+                                                        }
+                                                    }
                                                     var response = []
                                                     for (const index in result.rows){
 
