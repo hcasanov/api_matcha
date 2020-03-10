@@ -80,11 +80,12 @@ async function create_users() {
 
                 var token = JWT.generateTokenLogin(i)
                 var password = await bcrypt.hash("Password", 10);
+                var date = new Date();
 
 
-                await client.query("INSERT INTO accounts (login, name, firstname, mail, passwd, dateBirth, age, gender, description, hashtags, research_age_min, research_age_max, research_gender, date_created, date_update, confirm, token) VALUES (" + i + ", " + i + ", " + i + ", \'" + i + "@gmail.com\', \'" + password + "\', " + dateBirth + ", " + age + ", \'" + gender + "\', 'Mauris pretium molestie enim, tincidunt volutpat ligula accumsan at. Donec ullamcorper hendrerit dapibus. Integer feugiat in nisi vel maximus. Aliquam erat volutpat. Suspendisse potenti. Ut ultrices maximus lobortis', 'cuise,sport,code,foot', " + research_age_min + ", " + research_age_max + ", \'" + research_gender + "\', " + dateBirth + ", " + dateBirth + ", true, \'" + token + "\')", async (err, res) => {
+                await client.query("INSERT INTO accounts (login, name, firstname, mail, passwd, dateBirth, age, gender, description, hashtags, research_age_min, research_age_max, research_gender, date_created, date_update, confirm, token, last_connection) VALUES (" + i + ", " + i + ", " + i + ", \'" + i + "@gmail.com\', \'" + password + "\', " + dateBirth + ", " + age + ", \'" + gender + "\', 'Mauris pretium molestie enim, tincidunt volutpat ligula accumsan at. Donec ullamcorper hendrerit dapibus. Integer feugiat in nisi vel maximus. Aliquam erat volutpat. Suspendisse potenti. Ut ultrices maximus lobortis', 'cuise,sport,code,foot', " + research_age_min + ", " + research_age_max + ", \'" + research_gender + "\', " + dateBirth + ", " + dateBirth + ", true, \'" + token + "\', \'" + date + "\')", async (err, res) => {
                 });
-                var query = "INSERT INTO locations (id, latitude, longitude) VALUES (\'" + i + "\', '48.8534', '2.3488')"
+                var query = "INSERT INTO locations (id, latitude, longitude, date_created, date_update) VALUES (\'" + i + "\', '48.8534', '2.3488', \'" + date + "\', \'" + date + "\')"
                 await client.query(query);
 
                 i--;
