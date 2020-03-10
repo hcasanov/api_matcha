@@ -38,8 +38,7 @@ module.exports = {
                 var date_created = Date();
                 var date_update = Date();
                 var new_account = await client.query("INSERT INTO accounts (login, name, firstname, mail, passwd, datebirth, gender, date_created, date_update, confirm) VALUES (\'" + req.body.login + "\', \'" + req.body.name + "\', \'" + req.body.firstname + "\', \'" + req.body.mail + "\', \'" + passwd + "\', \'" + req.body.dateBirth + "\', \'" + req.body.gender + "\', \'" + date_created + "\', \'" + date_update + "\', false); ");
-                var new_location = await client.query("INSERT INTO locations (latitude, longitude, date_created, date_update) VALUES (\'" + req.body.latitude + "\', \'" + req.body.longitude + "\', \'" + date_created + "\', \'" + date_update + "\'); ");
-                if (new_account == 'error' || new_location == 'error') {
+                if (new_account == 'error') {
                     done();
                     return res.status(500).send('Internal Server Error');
                 }
@@ -50,6 +49,11 @@ module.exports = {
                             return res.status(500).send('Internal Server Error')
                         }
                         var new_id = result.rows[0].id;
+                        var new_location = await client.query("INSERT INTO locations (id, latitude, longitude, date_created, date_update) VALUES (" + new_id + ", \'" + req.body.latitude + "\', \'" + req.body.longitude + "\', \'" + date_created + "\', \'" + date_update + "\'); ");
+                        if (new_location == 'error') {
+                            done();
+                            return res.status(500).send('Internal Server Error');
+                        }
                         var new_token = JWT.generateTokenLogin(new_id)
                         await client.query("UPDATE accounts SET token = \'" + new_token + "\' WHERE id = \'" + new_id + "\';");
                         crypto.randomBytes(15, (err, buf) => {
