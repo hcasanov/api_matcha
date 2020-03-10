@@ -84,10 +84,8 @@ module.exports = {
                                     for (const index in result.rows){
                                         var query_pictures = "SELECT url_picture, profile_picture FROM pictures WHERE id_account = " + result.rows[index].id + ";"
                                         var query_location = "SELECT latitude, longitude FROM locations WHERE id = " + result.rows[index].id + ";"
-
                                         var pictures = await client.query(query_pictures)
                                         var locations = await client.query(query_location)
-
                                         var list_picture = []
                                         var profilePicture = ""
                                         for (const i in pictures.rows){
@@ -120,12 +118,12 @@ module.exports = {
                                         response.push(user)
                                     }
                                     return res.status(200).json(response)
-                                }else {
-                                    return res.satus(200).json({})
                                 }
-                            })
-                        }
-                    })
+                              })
+                            } else {
+                              return res.status(200).json([]);
+                            }
+                      })
                 }
                 else
                     return res.status(401).send('Unauthorized');
