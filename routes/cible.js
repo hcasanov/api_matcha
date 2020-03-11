@@ -104,7 +104,6 @@ module.exports = {
                                                         })
                                                         // var tab = []
                                                         for (const i in result.rows){
-                                                            console.log(i)
                                                             var query_block = "SELECT id FROM block WHERE from_id = " + jwt_decode(req.headers.token).id + " AND to_id = " + result.rows[i].id + ""
                                                             client.query(query_block, (err, response_block) => {
                                                                 if (err){
@@ -113,12 +112,10 @@ module.exports = {
                                                                 }
                                                                 else if (response_block.rows[0] != undefined){
                                                                     result.rows.splice(i, 1)
-                                                                    console.log(result.rows)
                                                                 }
                                                             })
                                                         }
                                                     }
-                                                    console.log(tab_parse)
                                                     var response = []
                                                     for (const index in result.rows){
 
