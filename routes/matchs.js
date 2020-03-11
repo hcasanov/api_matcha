@@ -75,7 +75,7 @@ module.exports = {
                                         list_matchs = list_matchs + ", " + result.rows[index].to_id
                                 }
                             }
-                            var select_matchs_query = "SELECT id, login, name, firstname, age, hashtags, description FROM accounts WHERE id IN (" + list_matchs + ");"
+                            var select_matchs_query = "SELECT id, login, name, firstname, age, hashtags, description, last_connection, online FROM accounts WHERE id IN (" + list_matchs + ");"
                             client.query(select_matchs_query, async (err, result) => {
                                 if (err)
                                     return res.status(500).send('Internal Server Error');
@@ -113,7 +113,9 @@ module.exports = {
                                             description: result.rows[index].description,
                                             location: locations.rows[0],
                                             pictures: list_picture,
-                                            profilePicture: profilePicture
+                                            profilePicture: profilePicture,
+                                            lastConnection: result.rows[index].last_connection,
+                                            online: result.rows[index].oneline
                                         }
                                         response.push(user)
                                     }
