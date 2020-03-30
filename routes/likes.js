@@ -11,7 +11,7 @@ const config = {
 const pool = new pg.Pool(config);
 
 module.exports = {
-    post: function(req, res){
+    post: function(req, res) {
         if (req.headers.token == undefined || req.body.to_id == undefined)
             return res.status(400).send('Bad Request');
         pool.connect(function (err, client, done) {

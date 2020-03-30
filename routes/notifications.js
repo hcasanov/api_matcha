@@ -1,5 +1,7 @@
 const jwt_decode = require('jwt-decode');
 const pg = require('pg');
+const { ioObj } = require('../socket/notifications');
+
 
 const config = {
     user: process.env.SQL_USER,
@@ -39,6 +41,7 @@ module.exports = {
                         return res.status(500)
                     }
                     else
+                        ioObj.io.to('USR' + to_id).emit('notification', 'new notification !');
                         return res.status(200).send('OK');
                 })
             })
@@ -70,6 +73,7 @@ module.exports = {
                         return res.status(500)
                     }
                     else
+                        ioObj.io.to('USR' + to_id).emit('notification', 'new notification !');
                         res.status(200).send('OK');
                 })
             })
@@ -79,7 +83,7 @@ module.exports = {
         var from_id = req.from_id;
         var to_id = req.to_id;
         var type = "match";
-        var match_id = req.match_id;
+        // var match_id = req.match_id;
         var name = "Someone like you";
 
         pool.connect(function (err, client, done) {
@@ -89,13 +93,14 @@ module.exports = {
             var status = true;
             var date_created = new Date();
             var date_update = new Date();
-            client.query("INSERT INTO notifications (type, match_id, name, from_id, to_id, status, message, date_created, date_update) VALUES (\'" + type + "\', \'" + match_id + "\', \'" + name + "\', \'" + from_id + "\', \'" + to_id + "\', \'" + status + "\', \'" + message + "\', \'" + date_created + "\', \'" + date_update + "\');", (err) => {
+            client.query("INSERT INTO notifications (type, match_id, name, from_id, to_id, status, message, date_created, date_update) VALUES (\'" + type + "\', \'" + '0' + "\', \'" + name + "\', \'" + from_id + "\', \'" + to_id + "\', \'" + status + "\', \'" + message + "\', \'" + date_created + "\', \'" + date_update + "\');", (err) => {
                 done();
                 if (err) {
                     console.log(err);
                     return 'ERROR'
                 }
                 else
+                    ioObj.io.to('USR' + to_id).emit('notification', 'new notification !');
                     return 'OK'
             })
         })
@@ -129,7 +134,7 @@ module.exports = {
         })
     },
     read: function (req, res) {
-        if (req.headers.token == undefined || req.body.id_notification == undefined)
+        if (req.headers.token == undefined || req.body.id == undefined)
             return res.status(400).send('Bad Request');
         pool.connect(function (err, client, done) {
             var id = jwt_decode(req.headers.token).id;
@@ -141,7 +146,7 @@ module.exports = {
                     return res.status(401).send('Unauthorized');
                 else if (result.rows[0].token === req.headers.token) {
                     var date_update = new Date();
-                    var update_query = "UPDATE notifications SET status = false, date_update = \'" + date_update + "\' WHERE id = " + req.body.id_notification + ";";
+                    var update_query = "UPDATE notifications SET status = false, date_update = \'" + date_update + "\' WHERE to_id = " + req.body.id + ";";
                     client.query(update_query, (err, result) => {
                         done();
                         if (err)
