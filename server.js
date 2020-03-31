@@ -2,8 +2,11 @@ const express = require('express');
 const body = require('body-parser');
 var cors = require('cors');
 const myRouter = require('./apiRouter').router;
+const http = require('http');
+const socketIo = require('socket.io');
 
 require('dotenv').config();
+const { ioObj } = require('./socket/notifications');
 
 // Set extensions
 let app = express();
@@ -24,17 +27,16 @@ app.use(function (req, res, next) {
     next();
 });
 
-app.listen(process.env.LISTEN_PORT)
+// app.listen(process.env.LISTEN_PORT)
 
 
 // io socket
-const server = require('http').Server(app)
-const io = require('socket.io')(server);
+const server = http.createServer(app)
 
-io.on('connection', (socket) => {
-    console.log('User connected')
+server.listen(process.env.LISTEN_PORT);
 
-    socket.on('disconnect'), () => {
-        console.log('User disconnected')
-    }
-})
+app.get('/', function (req, res) {
+  res.sendFile('/index.html', { root: '../front/public'});
+});
+
+ioObj.initSocket(server);
