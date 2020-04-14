@@ -27,7 +27,6 @@ module.exports = {
 
         if (!Checker.checkPasswd(req.body.passwd, req.body.repeatPasswd))
             return res.status(403).send("Incorrect password");
-
         Checker.accountExist(req.body.mail, async function (result) {
             if (result)
                 return res.status(400).send('Account already exist')
@@ -59,17 +58,16 @@ module.exports = {
                         crypto.randomBytes(15, (err, buf) => {
                             if (err) throw err;
                             var token_confirm = buf.toString('hex')
-                            client.query("UPDATE accounts SET token_confirm = \'" + token_confirm + "\' WHERE id = \'" + new_id + "\'", (err, result) => {
+                            client.query("UPDATE accounts SET token_confirm = \'" + token_confirm + "\' WHERE id = \'" + new_id + "\'", async (err, result) => {
                                 done()
                                 if (err) {
                                     res.status(500).send('Internal Server Error')
                                 }
-                                send_mail(token_confirm, req, (response) => {
-                                    if (response === "OK")
-                                        return res.status(200).send('OK')
-                                    else
-                                        return res.status(500).send('Internal Server Error')
-                                })
+                                const sendMail = await send_mail(token_confirm, req)
+                                if (sendMail === 'OK')
+                                    return res.status(200).send('OK')
+                                else
+                                    return res.status(500).send('Internal Server Error')
                             })
                         });
                     })
@@ -87,16 +85,16 @@ module.exports = {
                 return res.status(500).send('Internal Server Error');
             }
             else {
+                done();
                 res.status(200).send('OK')
             }
         })
     },
-    login: function (req, res) {
-        let { error } = Checker.ValidationErrorLogin(req.body)
+    login: async function (req, res) {
+        let { error } = await Checker.ValidationErrorLogin(req.body)
         if (error) {
             return res.status(403).send(error.details[0].message);
         }
-
         pool.connect(function (err, client, done) {
             client.query("SELECT id, passwd, confirm FROM accounts WHERE mail = \'" + req.body.mail + "\';", (err, result) => {
                 found = result.rows[0];
@@ -104,10 +102,14 @@ module.exports = {
                     console.log(err);
                     return res.status(500).send('Internal Server Error');
                 }
-                else if (found == undefined)
+                else if (found == undefined) {
+                    console.log('undefined')
                     return res.status(404).send('Not Found');
-                else if (found.confirm == false)
+                }
+                else if (found.confirm == false) {
+                    console.log('confirm')
                     return res.status(401).send('Unauthorizeds');
+                }
                 else {
                     bcrypt.compare(req.body.passwd, found.passwd, function (err, result) {
                         if (result) {
@@ -623,13 +625,13 @@ module.exports = {
                             var transporter = nodemailer.createTransport({
                                 service: 'gmail',
                                 auth: {
-                                    user: 'noelledeur@gmail.com',
-                                    pass: 'Lemotdepasseestmotdepasse'
+                                    user: '4242matcha4242@gmail.com',
+                                    pass: 'lemotdepasse111!'
                                 }
                             });
 
                             const mailOptions = {
-                                from: 'noelledeur@gmail.com', // sender address
+                                from: '@gmail.com', // sender address
                                 to: req.body.mail, // list of receivers
                                 subject: 'Forgot password matcha', // Subject line
                                 html: "Votre nouveau mot de passe est " + new_passwd + " ",// plaintext body
@@ -673,8 +675,8 @@ module.exports = {
                         var transporter = nodemailer.createTransport({
                             service: 'gmail',
                             auth: {
-                                user: 'noelledeur@gmail.com',
-                                pass: 'Lemotdepassenoelledeurestmotdepassenoelledeur'
+                                user: '4242matcha4242@gmail.com',
+                                pass: 'lemotdepasse111!'
                             }
                         });
 

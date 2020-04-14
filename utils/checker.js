@@ -10,7 +10,7 @@ const config = {
 const pool = new pg.Pool(config);
 
 module.exports = {
-    ValidationError: function (message) {
+    ValidationError: async function (message) {
         const Schema = Joi.object().keys({
             'login': Joi.string().min(2).max(50).required(),
             'name': Joi.string().min(2).max(15).required(),
@@ -50,7 +50,7 @@ module.exports = {
         })
         return Schema.validate(message);
     },
-    ValidationResearchParameters: function(message) {
+    ValidationResearchParameters: function (message) {
         const Schema = Joi.object().keys({
             '_id': Joi.string(),
             'hashtags': Joi.string().required(),
@@ -61,7 +61,7 @@ module.exports = {
         })
         return Schema.validate(message);
     },
-    ValidationErrorLogin: function (message) {
+    ValidationErrorLogin: async function (message) {
         const Schema = Joi.object().keys({
             'mail': Joi.string().email({ minDomainSegments: 2 }).required(),
             'passwd': Joi.string().required()
@@ -90,11 +90,11 @@ module.exports = {
     arrayHashtags: function (req) {
         return (req.split(','));
     },
-    accountExist: function(mail, callback){
-        pool.connect(function(err, client, done){
+    accountExist: function (mail, callback) {
+        pool.connect(function (err, client, done) {
             client.query("SELECT id FROM accounts WHERE mail = \'" + mail + "\';", (err, result) => {
                 done();
-                if (err){
+                if (err) {
                     console.log(err);
                 }
                 else if (result.rows[0] == undefined)

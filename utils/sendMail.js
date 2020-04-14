@@ -1,12 +1,12 @@
 var nodemailer = require('nodemailer');
 var xoauth2 = require('xoauth2');
 
-module.exports = function (token_confirm, req, callback) {
+module.exports = async function (token_confirm, req) {
   var transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: {
-      user: 'noelledeur@gmail.com',
-      pass: 'Lemotdepassenoelledeurestmotdepassenoelledeur'
+      user: '4242matcha4242@gmail.com',
+      pass: 'lemotdepasse111!'
     }
   });
 
@@ -17,11 +17,11 @@ module.exports = function (token_confirm, req, callback) {
     html: "Veuiller cliquer sur le lien pour confirmer votre compte : <a href='http://localhost:3000/accounts/confirm/" + token_confirm + "'>cliquer_ici</a>",// plaintext body
   };
 
-  transporter.sendMail(mailOptions, function (err, info) {
-    if (err)
-      console.log(err)
-    else
-      callback("OK")
-  });
+  const sendMail = await transporter.sendMail(mailOptions)
+  console.log(sendMail)
+  if (sendMail.error)
+    console.log(sendMail.error)
+  else
+    return ("OK")
 
 };  
